@@ -1,0 +1,2039 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>二年级科学：电路小小科学家</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Quicksand:wght=500;700&family=Noto+Sans+SC:wght=500;700&display=swap');
+    body {
+      font-family: 'Quicksand', 'Noto Sans SC', sans-serif;
+    }
+    .game-font {
+      font-family: 'Fredoka One', 'Noto Sans SC', sans-serif;
+    }
+    .node-pulse {
+      animation: pulse 1.5s infinite alternate;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+      100% { transform: scale(1.25); box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+    }
+    .glow-yellow {
+      filter: drop-shadow(0 0 15px rgba(253, 224, 71, 0.9)) drop-shadow(0 0 30px rgba(253, 224, 71, 0.6));
+    }
+    .highlight-card {
+      animation: bounce-highlight 1.2s ease-in-out 2;
+    }
+    @keyframes bounce-highlight {
+      0%, 100% { transform: scale(1); border-color: rgba(20, 184, 166, 0.3); box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+      50% { transform: scale(1.05); border-color: rgb(20, 184, 166); box-shadow: 0 10px 25px -5px rgb(20 184 166 / 0.4); }
+    }
+    /* Shake animation for wrong pairing */
+    .shake {
+      animation: shake-anim 0.4s ease-in-out;
+    }
+    @keyframes shake-anim {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+    /* Hide scrollbars for chrome/safari/opera */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    /* Hide scrollbars for ie/edge/firefox */
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    /* Dragging Visual Classes */
+    .option-selected {
+      border-color: #f59e0b !important;
+      background-color: #fef3c7 !important;
+      transform: scale(1.03);
+      box-shadow: 0 10px 15px -3px rgba(245, 158, 11, 0.3);
+    }
+    /* Elegant Simulated/Mock Fullscreen CSS Fallback for Sandbox Environment */
+    .mock-fullscreen-active {
+      position: fixed !important;
+      inset: 0 !important;
+      z-index: 9999 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      background-color: #fffbeb !important; /* Matches bg-amber-50 background */
+      overflow-y: auto !important;
+    }
+    /* Electron Flow Dash Animation */
+    .wire-active {
+      stroke-dasharray: 8, 4;
+      animation: electron-flow 1s linear infinite;
+    }
+    @keyframes electron-flow {
+      to {
+        stroke-dashoffset: -12;
+      }
+    }
+  </style>
+</head>
+<body class="bg-amber-50 min-h-screen flex flex-col justify-between overflow-x-hidden">
+
+  <!-- Fullscreen Zoom Backdrop for Sandbox Area -->
+  <div id="zoom-backdrop" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 hidden transition-all duration-300"></div>
+
+  <!-- Header Section (Sticky together for elegant scrolling) -->
+  <div class="sticky top-0 z-50 shadow-md">
+    
+    <!-- TIER 1: Main Title Bar (标题栏) -->
+    <header class="bg-gradient-to-r from-teal-400 to-emerald-500 text-white p-4">
+      <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-3">
+        
+        <!-- Left: Branding & Maker Info -->
+        <div class="flex items-center gap-3 w-full md:w-auto justify-center md:justify-start">
+          <div class="bg-white p-2 rounded-full shadow-inner text-teal-600 animate-bounce shrink-0">
+            <i data-lucide="zap" class="w-8 h-8 fill-current"></i>
+          </div>
+          <div>
+            <h1 class="text-xl sm:text-2xl font-bold game-font tracking-wide flex items-center gap-2">
+              电路小小科学家 
+              <span class="text-xs sm:text-sm text-yellow-200 font-semibold">Circuit Lab Master</span>
+            </h1>
+            <div class="flex flex-wrap items-center gap-2 mt-0.5 justify-center md:justify-start">
+              <span class="text-[11px] text-teal-100 font-medium">二年级科学 单元7：电 (Sains Tahun 2 Unit 7)</span>
+              <span class="text-[10px] bg-teal-800/40 text-yellow-300 px-2.5 py-0.5 rounded-full font-bold border border-yellow-300/20 whitespace-nowrap">
+                制作人：谢周安老师（Henry S.C.A）
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Language Selector & Fullscreen Button -->
+        <div class="flex items-center gap-2 shrink-0 justify-center w-full md:w-auto">
+          <div class="flex items-center gap-1 bg-teal-600/30 p-1 rounded-xl border border-teal-300/30">
+            <button onclick="setLanguage('zh')" id="lang-zh" class="px-2.5 py-1 text-xs font-bold rounded-lg transition-all bg-white text-teal-700 shadow-sm">华</button>
+            <button onclick="setLanguage('bm')" id="lang-bm" class="px-2.5 py-1 text-xs font-bold rounded-lg transition-all text-white hover:bg-teal-500/50">BM</button>
+            <button onclick="setLanguage('en')" id="lang-en" class="px-2.5 py-1 text-xs font-bold rounded-lg transition-all text-white hover:bg-teal-500/50">EN</button>
+          </div>
+          
+          <button onclick="toggleFullscreen()" class="p-2 bg-teal-600/30 hover:bg-teal-500/50 text-white rounded-xl border border-teal-300/30 flex items-center justify-center transition-all" title="一键全屏 / Fullscreen">
+            <i data-lucide="maximize" id="fullscreen-icon" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+          </button>
+        </div>
+
+      </div>
+    </header>
+
+    <!-- TIER 2: Tab Navigation Display Strip (显示条 - Physical Separation) -->
+    <nav class="bg-white border-b border-teal-100 py-2.5 px-4 overflow-x-auto no-scrollbar">
+      <div class="max-w-6xl mx-auto flex justify-start sm:justify-center">
+        <div class="flex bg-teal-50/70 p-1 rounded-2xl border border-teal-100 gap-1.5 whitespace-nowrap min-w-max">
+          <button onclick="switchTab('tab-vocab')" id="btn-tab-vocab" class="px-4 py-2 text-xs sm:text-sm font-bold rounded-xl transition-all bg-teal-500 text-white shadow-md flex items-center gap-1.5">
+            <i data-lucide="book-open" class="w-4 h-4 shrink-0"></i>
+            <span class="lang-text" data-zh="1. 科学词汇" data-bm="1. Kosa Kata" data-en="1. Vocab">1. 科学词汇</span>
+          </button>
+          <button onclick="switchTab('tab-func')" id="btn-tab-func" class="px-4 py-2 text-xs sm:text-sm font-bold rounded-xl transition-all text-teal-800 hover:bg-teal-100/50 flex items-center gap-1.5">
+            <i data-lucide="help-circle" class="w-4 h-4 shrink-0"></i>
+            <span class="lang-text" data-zh="2. 元件功能" data-bm="2. Fungsi" data-en="2. Functions">2. 元件功能</span>
+          </button>
+          <button onclick="switchTab('tab-match')" id="btn-tab-match" class="px-4 py-2 text-xs sm:text-sm font-bold rounded-xl transition-all text-teal-800 hover:bg-teal-100/50 flex items-center gap-1.5">
+            <i data-lucide="grid-3x3" class="w-4 h-4 shrink-0"></i>
+            <span class="lang-text" data-zh="3. 趣味配对" data-bm="3. Padanan" data-en="3. Match Game">3. 趣味配对</span>
+          </button>
+          <button onclick="switchTab('tab-game')" id="btn-tab-game" class="px-4 py-2 text-xs sm:text-sm font-bold rounded-xl transition-all text-teal-800 hover:bg-teal-100/50 flex items-center gap-1.5">
+            <i data-lucide="play" class="w-4 h-4 shrink-0"></i>
+            <span class="lang-text" data-zh="4. 电路挑战" data-bm="4. Cabaran" data-en="4. Game">4. 电路挑战</span>
+          </button>
+        </div>
+      </div>
+    </nav>
+
+  </div>
+
+  <!-- Component SVGs Templates definitions (Reused in Pages 1, 2, and 3) -->
+  <div class="hidden">
+    <div id="svg-tpl-battery">
+      <svg viewBox="0 0 100 60" class="w-24 h-16 sm:w-32 sm:h-22 transition-all duration-300">
+        <rect x="15" y="15" width="60" height="30" rx="4" fill="#374151" stroke="#1f2937" stroke-width="2"/>
+        <rect x="20" y="18" width="50" height="24" rx="2" fill="#f97316"/>
+        <rect x="75" y="24" width="6" height="12" rx="2" fill="#e2e8f0"/>
+        <text x="25" y="34" font-family="'Fredoka One', sans-serif" font-size="10" fill="#fff" font-weight="bold">1.5V</text>
+        <text x="60" y="34" font-family="sans-serif" font-size="12" fill="#fff" font-weight="bold">+</text>
+        <text x="22" y="34" font-family="sans-serif" font-size="12" fill="#fff" font-weight="bold">-</text>
+      </svg>
+    </div>
+    <div id="svg-tpl-bulb">
+      <svg viewBox="0 0 80 80" class="w-20 h-20 sm:w-26 sm:h-26 transition-all duration-300">
+        <circle cx="40" cy="35" r="20" fill="#fef08a" stroke="#ca8a04" stroke-width="2"/>
+        <path d="M 32 50 L 48 50 L 45 62 L 35 62 Z" fill="#94a3b8" stroke="#475569" stroke-width="2"/>
+        <path d="M 36 62 Q 40 66 44 62" fill="none" stroke="#475569" stroke-width="2"/>
+        <path d="M 33 35 Q 40 25 47 35" fill="none" stroke="#ca8a04" stroke-width="1.5"/>
+        <line x1="40" y1="35" x2="40" y2="50" stroke="#ca8a04" stroke-width="1.5"/>
+      </svg>
+    </div>
+    <div id="svg-tpl-switch">
+      <svg viewBox="0 0 100 60" class="w-24 h-14 sm:w-32 sm:h-18 transition-all duration-300">
+        <rect x="20" y="35" width="60" height="8" rx="2" fill="#78350f"/>
+        <circle cx="30" cy="30" r="5" fill="#94a3b8" stroke="#475569" stroke-width="2"/>
+        <circle cx="70" cy="30" r="5" fill="#94a3b8" stroke="#475569" stroke-width="2"/>
+        <line x1="30" y1="30" x2="65" y2="10" stroke="#d97706" stroke-width="5" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div id="svg-tpl-wire">
+      <svg viewBox="0 0 100 60" class="w-24 h-14 sm:w-32 sm:h-18 transition-all duration-300">
+        <path d="M 15 20 Q 50 45 85 20" fill="none" stroke="#ef4444" stroke-width="4" stroke-linecap="round"/>
+        <path d="M 15 35 Q 50 60 85 35" fill="none" stroke="#1f2937" stroke-width="4" stroke-linecap="round"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Main Content Space -->
+  <main class="max-w-5xl mx-auto w-full px-4 py-6 flex-grow">
+    
+    <!-- PAGE 1: SCIENCE VOCABULARY (科学词汇) -->
+    <div id="page-vocab" class="tab-content block">
+      <div class="text-center mb-6">
+        <h2 class="text-2xl font-extrabold text-slate-800 game-font lang-text" data-zh="🌟 认识电路中的元件" data-bm="🌟 Kenali Komponen Litar" data-en="🌟 Know Your Circuit Components">🌟 认识电路中的元件</h2>
+        <p class="text-slate-600 text-sm mt-1 lang-text" data-zh="上下滑动查看，点击左边超大元件图听发音，点击【查看功能】按钮深入学习！" data-bm="Skrol ke atas/bawah, klik gambar untuk dengar sebutan!" data-en="Scroll up/down, click component image to pronounce, and click button to view function!">上下滑动查看，点击左边超大元件图听发音，点击【查看功能】按钮深入学习！</p>
+      </div>
+
+      <!-- Scrollable Vertical Container for Cards -->
+      <div class="max-w-2xl mx-auto space-y-5 max-h-[580px] overflow-y-auto pr-2 scrollbar-thin">
+        
+        <!-- Component 1: Dry Cell -->
+        <div class="bg-white rounded-3xl p-5 shadow-md border-2 border-orange-100 hover:border-orange-300 hover:shadow-lg transition-all flex flex-row items-center gap-6">
+          <div onclick="speakText('battery')" class="w-32 h-32 sm:w-40 sm:h-40 bg-orange-50 rounded-2xl flex-shrink-0 flex items-center justify-center relative cursor-pointer group shadow-inner border border-orange-100/50">
+            <div id="target-svg-battery-1" class="w-full h-full flex items-center justify-center transform scale-110 sm:scale-125"></div>
+            <button class="absolute top-2 right-2 p-1.5 bg-orange-200 text-orange-700 hover:bg-orange-300 rounded-xl transition-all">
+              <i data-lucide="volume-2" class="w-5 h-5"></i>
+            </button>
+          </div>
+          <div class="flex-grow flex flex-col justify-between h-32 sm:h-40">
+            <div>
+              <span class="text-xs text-orange-600 font-black uppercase tracking-wider lang-text" data-zh="元件一" data-bm="Komponen 1" data-en="Component 1">元件一</span>
+              <h3 class="text-xl sm:text-2xl font-black text-slate-800 flex items-baseline gap-2 mt-0.5">
+                干电池 
+                <span class="text-sm text-slate-400 font-bold">gān diàn chí</span>
+              </h3>
+              <p class="text-sm sm:text-base font-extrabold text-slate-500 mt-1">
+                Sel Kering <span class="text-xs text-slate-400 font-normal">/ Dry Cell</span>
+              </p>
+            </div>
+            <button onclick="viewFunction('battery')" class="self-start px-5 py-2.5 bg-orange-500 hover:bg-orange-600 active:scale-95 text-white font-black rounded-xl text-xs sm:text-sm flex items-center gap-1.5 transition-all shadow-sm">
+              <i data-lucide="arrow-right-circle" class="w-4 h-4"></i>
+              <span class="lang-text" data-zh="查看功能" data-bm="Lihat Fungsi" data-en="View Function">查看功能</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Component 2: Bulb -->
+        <div class="bg-white rounded-3xl p-5 shadow-md border-2 border-yellow-100 hover:border-yellow-300 hover:shadow-lg transition-all flex flex-row items-center gap-6">
+          <div onclick="speakText('bulb')" class="w-32 h-32 sm:w-40 sm:h-40 bg-yellow-50 rounded-2xl flex-shrink-0 flex items-center justify-center relative cursor-pointer group shadow-inner border border-yellow-100/50">
+            <div id="target-svg-bulb-1" class="w-full h-full flex items-center justify-center transform scale-110 sm:scale-125"></div>
+            <button class="absolute top-2 right-2 p-1.5 bg-yellow-200 text-yellow-700 hover:bg-yellow-300 rounded-xl transition-all">
+              <i data-lucide="volume-2" class="w-5 h-5"></i>
+            </button>
+          </div>
+          <div class="flex-grow flex flex-col justify-between h-32 sm:h-40">
+            <div>
+              <span class="text-xs text-yellow-600 font-black uppercase tracking-wider lang-text" data-zh="元件二" data-bm="Komponen 2" data-en="Component 2">元件二</span>
+              <h3 class="text-xl sm:text-2xl font-black text-slate-800 flex items-baseline gap-2 mt-0.5">
+                灯泡 
+                <span class="text-sm text-slate-400 font-bold">dēng pào</span>
+              </h3>
+              <p class="text-sm sm:text-base font-extrabold text-slate-500 mt-1">
+                Mentol <span class="text-xs text-slate-400 font-normal">/ Bulb</span>
+              </p>
+            </div>
+            <button onclick="viewFunction('bulb')" class="self-start px-5 py-2.5 bg-yellow-500 hover:bg-yellow-600 active:scale-95 text-white font-black rounded-xl text-xs sm:text-sm flex items-center gap-1.5 transition-all shadow-sm">
+              <i data-lucide="arrow-right-circle" class="w-4 h-4"></i>
+              <span class="lang-text" data-zh="查看功能" data-bm="Lihat Fungsi" data-en="View Function">查看功能</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Component 3: Switch -->
+        <div class="bg-white rounded-3xl p-5 shadow-md border-2 border-blue-100 hover:border-blue-300 hover:shadow-lg transition-all flex flex-row items-center gap-6">
+          <div onclick="speakText('switch')" class="w-32 h-32 sm:w-40 sm:h-40 bg-blue-50 rounded-2xl flex-shrink-0 flex items-center justify-center relative cursor-pointer group shadow-inner border border-blue-100/50">
+            <div id="target-svg-switch-1" class="w-full h-full flex items-center justify-center transform scale-110 sm:scale-125"></div>
+            <button class="absolute top-2 right-2 p-1.5 bg-blue-200 text-blue-700 hover:bg-blue-300 rounded-xl transition-all">
+              <i data-lucide="volume-2" class="w-5 h-5"></i>
+            </button>
+          </div>
+          <div class="flex-grow flex flex-col justify-between h-32 sm:h-40">
+            <div>
+              <span class="text-xs text-blue-600 font-black uppercase tracking-wider lang-text" data-zh="元件三" data-bm="Komponen 3" data-en="Component 3">元件三</span>
+              <h3 class="text-xl sm:text-2xl font-black text-slate-800 flex items-baseline gap-2 mt-0.5">
+                开关 
+                <span class="text-sm text-slate-400 font-bold">kāi guān</span>
+              </h3>
+              <p class="text-sm sm:text-base font-extrabold text-slate-500 mt-1">
+                Suis <span class="text-xs text-slate-400 font-normal">/ Switch</span>
+              </p>
+            </div>
+            <button onclick="viewFunction('switch')" class="self-start px-5 py-2.5 bg-blue-500 hover:bg-blue-600 active:scale-95 text-white font-black rounded-xl text-xs sm:text-sm flex items-center gap-1.5 transition-all shadow-sm">
+              <i data-lucide="arrow-right-circle" class="w-4 h-4"></i>
+              <span class="lang-text" data-zh="查看功能" data-bm="Lihat Fungsi" data-en="View Function">查看功能</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Component 4: Wire -->
+        <div class="bg-white rounded-3xl p-5 shadow-md border-2 border-red-100 hover:border-red-300 hover:shadow-lg transition-all flex flex-row items-center gap-6">
+          <div onclick="speakText('wire')" class="w-32 h-32 sm:w-40 sm:h-40 bg-red-50 rounded-2xl flex-shrink-0 flex items-center justify-center relative cursor-pointer group shadow-inner border border-red-100/50">
+            <div id="target-svg-wire-1" class="w-full h-full flex items-center justify-center transform scale-110 sm:scale-125"></div>
+            <button class="absolute top-2 right-2 p-1.5 bg-red-200 text-red-700 hover:bg-red-300 rounded-xl transition-all">
+              <i data-lucide="volume-2" class="w-5 h-5"></i>
+            </button>
+          </div>
+          <div class="flex-grow flex flex-col justify-between h-32 sm:h-40">
+            <div>
+              <span class="text-xs text-red-600 font-black uppercase tracking-wider lang-text" data-zh="元件四" data-bm="Komponen 4" data-en="Component 4">元件四</span>
+              <h3 class="text-xl sm:text-2xl font-black text-slate-800 flex items-baseline gap-2 mt-0.5">
+                电线 
+                <span class="text-sm text-slate-400 font-bold">diàn xiàn</span>
+              </h3>
+              <p class="text-sm sm:text-base font-extrabold text-slate-500 mt-1">
+                Wayar <span class="text-xs text-slate-400 font-normal">/ Wire</span>
+              </p>
+            </div>
+            <button onclick="viewFunction('wire')" class="self-start px-5 py-2.5 bg-red-500 hover:bg-red-600 active:scale-95 text-white font-black rounded-xl text-xs sm:text-sm flex items-center gap-1.5 transition-all shadow-sm">
+              <i data-lucide="arrow-right-circle" class="w-4 h-4"></i>
+              <span class="lang-text" data-zh="查看功能" data-bm="Lihat Fungsi" data-en="View Function">查看功能</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- PAGE 2: COMPONENT FUNCTIONS (元件功能) -->
+    <div id="page-func" class="tab-content hidden">
+      <div class="text-center mb-6">
+        <h2 class="text-2xl font-extrabold text-slate-800 game-font lang-text" data-zh="💡 认识元件的功能" data-bm="💡 Belajar Fungsi Komponen" data-en="💡 Learn Component Functions">💡 认识元件的功能</h2>
+        <p class="text-slate-600 text-sm mt-1 lang-text" data-zh="每个元件在电路里都有着超级重要的任务哦！" data-bm="Setiap komponen mempunyai fungsi penting masing-masing!" data-en="Every component has an important job in a circuit!">每个元件在电路里都有着超级重要的任务哦！</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+        <!-- Function 1: Battery -->
+        <div id="func-card-battery" class="bg-white rounded-3xl p-5 shadow-md border-2 border-slate-100 flex flex-col sm:flex-row gap-5 items-center sm:items-start hover:shadow-lg transition-all">
+          <div class="bg-orange-50 p-4 rounded-2xl shrink-0 w-32 h-32 flex items-center justify-center border border-orange-100/50 shadow-inner">
+            <div id="target-svg-battery-2" class="w-full h-full flex items-center justify-center transform scale-110"></div>
+          </div>
+          <div class="flex-grow text-center sm:text-left">
+            <h3 class="text-xl font-black text-slate-800 mb-2 flex items-center justify-center sm:justify-start gap-2">
+              <span class="lang-text" data-zh="干电池" data-bm="Sel Kering" data-en="Dry Cell">干电池</span>
+              <span class="text-xs bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full">➕ / ➖</span>
+            </h3>
+            
+            <p class="lang-text text-sm font-bold text-slate-500 mb-3" 
+               data-zh="提供电能 ⚡" 
+               data-bm="Membekalkan tenaga elektrik ⚡" 
+               data-en="Supplies electrical energy ⚡"></p>
+               
+            <div class="bg-orange-50 border border-orange-100 p-3 rounded-xl text-left">
+              <p class="text-sm text-orange-950 font-medium leading-relaxed lang-text" 
+                 data-zh="干电池的功能是【提供电能】。它有加（➕）和减（➖）两极。电流就是从这里源源不断地出发哦！" 
+                 data-bm="Fungsi sel kering adalah untuk membekalkan tenaga elektrik bagi membolehkan arus mengalir dalam litar." 
+                 data-en="The function of a dry cell is to supply electrical energy to the circuit. It has positive (+) and negative (-) terminals."></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Function 2: Bulb -->
+        <div id="func-card-bulb" class="bg-white rounded-3xl p-5 shadow-md border-2 border-slate-100 flex flex-col sm:flex-row gap-5 items-center sm:items-start hover:shadow-lg transition-all">
+          <div class="bg-yellow-50 p-4 rounded-2xl shrink-0 w-32 h-32 flex items-center justify-center border border-yellow-100/50 shadow-inner">
+            <div id="target-svg-bulb-2" class="w-full h-full flex items-center justify-center transform scale-110"></div>
+          </div>
+          <div class="flex-grow text-center sm:text-left">
+            <h3 class="text-xl font-black text-slate-800 mb-2 flex items-center justify-center sm:justify-start gap-2">
+              <span class="lang-text" data-zh="灯泡" data-bm="Mentol" data-en="Bulb">灯泡</span>
+              <span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full">💡</span>
+            </h3>
+            
+            <p class="lang-text text-sm font-bold text-slate-500 mb-3" 
+               data-zh="发出光芒 💡" 
+               data-bm="Mengeluarkan cahaya 💡" 
+               data-en="Emits light 💡"></p>
+               
+            <div class="bg-yellow-50 border border-yellow-100 p-3 rounded-xl text-left">
+              <p class="text-sm text-yellow-950 font-medium leading-relaxed lang-text" 
+                 data-zh="灯泡的功能是【发出光芒】。当完整的电路接通，电流通过灯泡里的细小灯丝时，它就会亮起来！" 
+                 data-bm="Fungsi mentol adalah untuk mengeluarkan cahaya apabila mendapat tenaga elektrik yang mencukupi." 
+                 data-en="The function of a bulb is to emit light. When electric current flows through its filament, it glows warmly."></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Function 3: Switch -->
+        <div id="func-card-switch" class="bg-white rounded-3xl p-5 shadow-md border-2 border-slate-100 flex flex-col sm:flex-row gap-5 items-center sm:items-start hover:shadow-lg transition-all">
+          <div class="bg-blue-50 p-4 rounded-2xl shrink-0 w-32 h-32 flex items-center justify-center border border-blue-100/50 shadow-inner">
+            <div id="target-svg-switch-2" class="w-full h-full flex items-center justify-center transform scale-110"></div>
+          </div>
+          <div class="flex-grow text-center sm:text-left">
+            <h3 class="text-xl font-black text-slate-800 mb-2 flex items-center justify-center sm:justify-start gap-2">
+              <span class="lang-text" data-zh="开关" data-bm="Suis" data-en="Switch">开关</span>
+              <span class="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">🔌</span>
+            </h3>
+            
+            <p class="lang-text text-sm font-bold text-slate-500 mb-3" 
+               data-zh="联接或断开电路 🔌" 
+               data-bm="Menyambungkan & memutuskan litar 🔌" 
+               data-en="Connects or breaks circuits 🔌"></p>
+               
+            <div class="bg-blue-50 border border-blue-100 p-3 rounded-xl text-left">
+              <p class="text-sm text-blue-950 font-medium leading-relaxed lang-text" 
+                 data-zh="开关用来【联接或断开电路】。把它的闸门按下（闭合）能让灯泡发亮，拉起闸门（断开）会熄灭灯泡。" 
+                 data-bm="Fungsi suis adalah untuk menyambungkan atau memutuskan litar elektrik bagi mengawal aliran arus." 
+                 data-en="The function of a switch is to connect or break the circuit, giving control over the electric current flow."></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Function 4: Wire -->
+        <div id="func-card-wire" class="bg-white rounded-3xl p-5 shadow-md border-2 border-slate-100 flex flex-col sm:flex-row gap-5 items-center sm:items-start hover:shadow-lg transition-all">
+          <div class="bg-red-50 p-3 rounded-2xl shrink-0 w-32 h-32 flex items-center justify-center border border-red-100/50 shadow-inner">
+            <div id="target-svg-wire-2" class="w-full h-full flex items-center justify-center transform scale-110"></div>
+          </div>
+          <div class="flex-grow text-center sm:text-left">
+            <h3 class="text-xl font-black text-slate-800 mb-2 flex items-center justify-center sm:justify-start gap-2">
+              <span class="lang-text" data-zh="电线" data-bm="Wayar" data-en="Wire">电线</span>
+              <span class="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full">🔴 ⚫</span>
+            </h3>
+            
+            <p class="lang-text text-sm font-bold text-slate-500 mb-3" 
+               data-zh="输送电流 🔴 ⚫" 
+               data-bm="Mengalirkan arus elektrik 🔴 ⚫" 
+               data-en="Carries electric current 🔴 ⚫"></p>
+               
+            <div class="bg-red-50 border border-red-100 p-3 rounded-xl text-left">
+              <p class="text-sm text-red-950 font-medium leading-relaxed lang-text" 
+                 data-zh="电线的作用是【输送电流】。它就像一条安全的高速公路，连接起电池、开关和灯座，让电通过。" 
+                 data-bm="Fungsi wayar adalah untuk mengalirkan arus elektrik bagi menyambungkan setiap komponen ke dalam litar." 
+                 data-en="The function of a wire is to carry electric current, bridging all components together into a complete path."></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Nav back Button -->
+      <div class="text-center mt-8">
+        <button onclick="switchTab('tab-match')" class="px-6 py-3 bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-600 hover:to-emerald-700 text-white font-black rounded-2xl shadow-md transform hover:scale-105 transition-all">
+          <span class="lang-text" data-zh="进入第 3 关：趣味拖拽配对游戏！👉" data-bm="Mula Main Permainan Padanan! 👉" data-en="Go to Step 3: Play Drag & Drop Matching Games! 👉">进入第 3 关：趣味拖拽配对游戏！👉</span>
+        </button>
+      </div>
+    </div>
+
+
+    <!-- PAGE 3: MATCHING GAMES (趣味拖拽配对游戏) -->
+    <div id="page-match" class="tab-content hidden max-w-4xl mx-auto">
+      <div class="text-center mb-6">
+        <h2 class="text-2xl font-extrabold text-slate-800 game-font lang-text" data-zh="🧩 元件功能拖拽大挑战" data-bm="🧩 Cabaran Padanan Seret & Lepas" data-en="🧩 Drag & Drop Matching Challenge">🧩 元件功能拖拽大挑战</h2>
+        <p class="text-slate-600 text-sm mt-1 lang-text" 
+           data-zh="拖动下方的答案卡到对应元件图下方的【空格】内，全部放好后点击【提交验证】吧！" 
+           data-bm="Seret kad jawapan di bawah ke dalam petak kosong di bawah gambar komponen. Klik [Hantar] selepas selesai!" 
+           data-en="Drag the answer cards below into the empty slots under each component. Click [Submit] when done!">
+          拖动下方的答案卡到对应元件图下方的【空格】内，全部放好后点击【提交验证】吧！
+        </p>
+      </div>
+
+      <!-- Mode Selector for Matching Game -->
+      <div class="flex justify-center gap-3 mb-6 bg-emerald-100/60 p-1.5 rounded-2xl max-w-md mx-auto border border-emerald-200">
+        <button onclick="setMatchMode('name')" id="btn-match-mode-name" class="flex-1 py-2 px-3 rounded-xl font-extrabold text-xs sm:text-sm bg-white text-emerald-800 shadow-sm transition-all">
+          <span class="lang-text" data-zh="配对一：元件 🔗 名称" data-bm="Padanan 1: Nama" data-en="Match 1: Component Name">配对一：元件 🔗 名称</span>
+        </button>
+        <button onclick="setMatchMode('function')" id="btn-match-mode-function" class="flex-1 py-2 px-3 rounded-xl font-extrabold text-xs sm:text-sm text-emerald-700 hover:bg-emerald-50 transition-all">
+          <span class="lang-text" data-zh="配对二：元件 🔗 功能" data-bm="Padanan 2: Fungsi" data-en="Match 2: Component Function">配对二：元件 🔗 功能</span>
+        </button>
+      </div>
+
+      <!-- Drag Board Container -->
+      <div class="bg-white rounded-3xl p-6 shadow-md border-4 border-emerald-400 relative">
+        <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-100">
+          <div class="flex items-center gap-2">
+            <span class="text-sm font-bold text-slate-500 lang-text" data-zh="游戏状态：" data-bm="Status:" data-en="Status:">游戏状态：</span>
+            <span id="match-status-badge" class="px-2.5 py-1 text-xs font-black rounded-full bg-amber-100 text-amber-700 lang-text" data-zh="待填充..." data-bm="Belum Lengkap" data-en="Filling up...">待填充...</span>
+          </div>
+          <button onclick="initMatchGame()" class="flex items-center gap-1.5 bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-white px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-sm">
+            <i data-lucide="shuffle" class="w-3.5 h-3.5"></i>
+            <span class="lang-text" data-zh="随机洗牌" data-bm="Rawak Semula" data-en="Shuffle & Replay">随机洗牌</span>
+          </button>
+        </div>
+
+        <!-- Dropzones Row (4 columns) -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8" id="match-dropzones-container">
+          <!-- Rendered dynamically via Javascript -->
+        </div>
+
+        <!-- Draggable Options Pool Area -->
+        <div class="bg-slate-50 p-5 rounded-2xl border-2 border-dashed border-slate-200">
+          <h4 class="text-xs font-black text-slate-500 uppercase tracking-wider mb-3 text-center lang-text" 
+              data-zh="💡 答案选项卡（拖动或先点击卡片再点击空格）：" 
+              data-bm="💡 Kad Pilihan Jawapan (Seret atau klik kad kemudian klik petak kosong):" 
+              data-en="💡 Answer Option Cards (Drag or tap card, then tap empty slot):">
+            💡 答案选项卡（拖动或先点击卡片再点击空格）：
+          </h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 min-h-[70px]" id="match-options-pool">
+            <!-- Options dynamically placed here -->
+          </div>
+        </div>
+
+        <!-- Submit & Control Action footer -->
+        <div class="flex justify-center mt-6 gap-3">
+          <button onclick="checkDragMatching()" id="btn-match-submit" disabled class="px-8 py-3 bg-slate-300 text-slate-500 cursor-not-allowed font-black rounded-2xl shadow-md transition-all flex items-center gap-2 text-sm sm:text-base">
+            <i data-lucide="check-square" class="w-5 h-5"></i>
+            <span class="lang-text" data-zh="提交验证" data-bm="Hantar & Semak" data-en="Submit & Check">提交验证</span>
+          </button>
+        </div>
+
+        <!-- Score Feedback Popup Card inside Page 3 -->
+        <div id="match-score-box" class="absolute inset-0 bg-white/95 rounded-2xl flex flex-col items-center justify-center p-6 text-center z-20 hidden transition-all duration-300">
+          <div class="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mb-4 border-2 border-emerald-400 animate-pulse">
+            <i data-lucide="sparkles" class="w-12 h-12 text-emerald-500"></i>
+          </div>
+          <div id="score-stars-container" class="flex gap-1 mb-3 text-yellow-400 justify-center">
+            <!-- Stars rendered dynamically -->
+          </div>
+          <h3 class="text-2xl sm:text-3xl font-black text-slate-800 mb-1 game-font">
+            <span class="lang-text" data-zh="本次得分：" data-bm="Markah Anda:" data-en="Your Score:">本次得分：</span>
+            <span id="match-score-val" class="text-emerald-500 text-3xl sm:text-4xl">80</span>/100
+          </h3>
+          <p id="match-score-feedback" class="text-slate-600 text-sm font-bold max-w-sm mb-6">
+            <!-- Dynamic Encouraging Text -->
+          </p>
+          <button onclick="skipScoreCountdown()" class="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-white font-extrabold rounded-xl text-xs sm:text-sm transition-all shadow-md flex items-center gap-2">
+            <span id="countdown-btn-text">继续配对 (5s)...</span>
+            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <!-- Victory Popup Card inside Page 3 -->
+        <div id="match-victory-box" class="absolute inset-0 bg-white/95 rounded-2xl flex flex-col items-center justify-center p-6 text-center z-20 hidden transition-all duration-300">
+          <div class="w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center mb-3 border-2 border-yellow-400 animate-bounce">
+            <i data-lucide="party-popper" class="w-12 h-12 text-yellow-500 fill-current"></i>
+          </div>
+          <h3 class="text-2xl sm:text-3xl font-black text-slate-800 mb-1 game-font lang-text" data-zh="🎉 太棒了！全部连对！" data-bm="🎉 Cemerlang! Semua Betul!" data-en="🎉 Splendid! Perfect Match!">🎉 太棒了！全部连对！</h3>
+          <p class="text-slate-500 text-sm max-w-sm mb-5 lang-text"
+             data-zh="你太厉害了！已经百分之百掌握了二年级科学电学元件的名称和功能！"
+             data-bm="Syabas! Anda telah memahami semua nama dan fungsi komponen litar elektrik dengan cemerlang!"
+             data-en="Awesome! You fully understand standard Malaysian science electrical elements and their functions.">
+            你太厉害了！已经百分之百掌握了二年级科学电学元件的名称和功能！
+          </p>
+          <div class="flex gap-3">
+            <button onclick="initMatchGame()" class="px-5 py-3 bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-white font-bold rounded-xl text-xs sm:text-sm transition-all shadow">
+              <span class="lang-text" data-zh="再挑战一次 🔄" data-bm="Main Lagi 🔄" data-en="Play Again 🔄">再挑战一次 🔄</span>
+            </button>
+            <button onclick="switchTab('tab-game')" class="px-5 py-3 bg-amber-500 hover:bg-amber-600 active:scale-95 text-white font-bold rounded-xl text-xs sm:text-sm transition-all shadow">
+              <span class="lang-text" data-zh="前往电路大冒险 ⚡" data-bm="Ke Cabaran Litar ⚡" data-en="Go to Circuit Challenge ⚡">前往电路大冒险 ⚡</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- PAGE 4: GAME WORKSPACE (电路连线大冒险) -->
+    <div id="page-game" class="tab-content hidden grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fade-in">
+      
+      <!-- Left Controls Panel -->
+      <div class="lg:col-span-1 flex flex-col gap-4">
+        <!-- Game Mode Selector -->
+        <div class="bg-white rounded-2xl p-4 shadow-sm border-2 border-emerald-100">
+          <h2 class="text-lg font-bold text-slate-700 mb-3 flex items-center gap-2">
+            <i data-lucide="gamepad-2" class="text-emerald-500"></i>
+            <span class="lang-text" data-zh="选择游戏模式" data-bm="Pilih Mod Permainan" data-en="Select Game Mode">选择游戏模式</span>
+          </h2>
+          <div class="grid grid-cols-2 gap-2">
+            <button id="mode-guided" onclick="setMode('guided')" class="p-2.5 rounded-xl border-2 border-amber-400 bg-amber-50 text-amber-800 font-bold text-sm flex flex-col items-center gap-1 transition-all">
+              <span class="text-lg">🌟</span>
+              <span class="lang-text" data-zh="引导模式" data-bm="Mod Bimbingan" data-en="Guided Mode">引导模式</span>
+            </button>
+            <button id="mode-sandbox" onclick="setMode('sandbox')" class="p-2.5 rounded-xl border-2 border-slate-200 bg-slate-50 text-slate-600 font-bold text-sm flex flex-col items-center gap-1 transition-all hover:bg-slate-100">
+              <span class="text-lg">🧠</span>
+              <span class="lang-text" data-zh="自由模式" data-bm="Mod Bebas" data-en="Sandbox Mode">自由模式</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Wire Color Selection Tool -->
+        <div class="bg-white rounded-2xl p-4 shadow-sm border-2 border-emerald-100">
+          <h2 class="text-lg font-bold text-slate-700 mb-3 flex items-center gap-2">
+            <i data-lucide="paintbrush" class="text-teal-500"></i>
+            <span class="lang-text" data-zh="选择电线颜色" data-bm="Pilih Warna Wayar" data-en="Select Wire Color">选择电线颜色</span>
+          </h2>
+          <p class="text-xs text-slate-500 mb-3 lang-text" data-zh="💡 提示：加（➕）接红色电线，减（➖）接黑色电线！" data-bm="💡 Tip: Wayar merah untuk (+), hitam untuk (-)." data-en="💡 Tip: Use red wire for (+), black wire for (-).">💡 提示：加（➕）接红色电线，减（➖）接黑色电线！</p>
+          <div class="flex flex-col gap-2">
+            <button onclick="setWireColor('red')" id="btn-wire-red" class="flex items-center justify-between px-3 py-2.5 rounded-xl border-2 border-red-500 bg-red-100 text-red-700 font-bold text-sm transition-all ring-4 ring-red-300">
+              <div class="flex items-center gap-2">
+                <span class="w-4 h-4 rounded-full bg-red-600 block"></span>
+                <span class="lang-text" data-zh="红色电线 (➕)" data-bm="Wayar Merah (+)" data-en="Red Wire (+)">红色电线 (➕)</span>
+              </div>
+              <i data-lucide="check" class="wire-check-icon w-4 h-4 text-red-600"></i>
+            </button>
+            <button onclick="setWireColor('black')" id="btn-wire-black" class="flex items-center justify-between px-3 py-2.5 rounded-xl border-2 border-slate-700 bg-slate-100 text-slate-700 font-bold text-sm transition-all">
+              <div class="flex items-center gap-2">
+                <span class="w-4 h-4 rounded-full bg-slate-800 block"></span>
+                <span class="lang-text" data-zh="黑色电线 (➖)" data-bm="Wayar Hitam (-)" data-en="Black Wire (-)">黑色电线 (➖)</span>
+              </div>
+              <i data-lucide="check" class="wire-check-icon w-4 h-4 text-transparent"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Quick Info Box -->
+        <div class="bg-gradient-to-br from-teal-50 to-emerald-50 rounded-2xl p-4 border border-teal-200">
+          <h3 class="font-bold text-teal-800 flex items-center gap-1.5 text-sm mb-1">
+            <i data-lucide="info" class="w-4 h-4"></i>
+            <span class="lang-text" data-zh="干电池反转提示 🔄" data-bm="Sel Kering Diterbalikkan 🔄" data-en="Battery Direction Reversed 🔄">干电池反转提示 🔄</span>
+          </h3>
+          <p class="text-xs text-slate-600 leading-relaxed lang-text"
+             data-zh="在本关中，干电池的朝向已经调转了！它的【正极 (➕) 在左侧】，【负极 (➖) 在右侧】！请看准符号连线哦！"
+             data-bm="Awas! Posisi sel kering telah diterbalikkan! Terminal positif (+) berada di kiri dan terminal negatif (-) berada di kanan."
+             data-en="Attention! The dry cell direction is reversed! Positive (+) is on the LEFT, and negative (-) is on the RIGHT!">
+            在本关中，干电池的朝向已经调转了！它的【正极 (➕) 在左侧】，【负极 (➖) 在右侧】！请看准符号连线哦！
+          </p>
+        </div>
+      </div>
+
+      <!-- Right Circuit Board Workspace Card -->
+      <div class="lg:col-span-2 flex flex-col gap-4 relative transition-all duration-300" id="interactive-board-card">
+        
+        <div class="bg-white rounded-3xl p-6 shadow-md border-4 border-teal-400 relative overflow-hidden flex-grow flex flex-col justify-between min-h-[500px]">
+          
+          <!-- Blackboard Instructions & Action Panel -->
+          <div class="bg-slate-800 text-emerald-300 p-3 rounded-xl text-center text-xs sm:text-sm font-semibold shadow-inner mb-4 flex justify-between items-center gap-2">
+            <div class="flex items-center gap-2 text-left flex-grow">
+              <i data-lucide="info" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+              <span id="instruction-text">请依次点击高亮虚线框的接线柱，将电路连接起来。</span>
+            </div>
+            
+            <div class="flex items-center gap-1.5 shrink-0">
+              <!-- 一键放大 (Zoom In/Out) Button -->
+              <button onclick="toggleZoom()" id="btn-zoom" class="flex items-center gap-1 bg-teal-500 hover:bg-teal-600 active:scale-95 text-white px-2.5 py-1 rounded-md text-xs transition-all">
+                <i data-lucide="maximize-2" id="zoom-btn-icon" class="w-3.5 h-3.5"></i>
+                <span id="zoom-btn-text" class="lang-text" data-zh="一键放大" data-bm="Besarkan" data-en="Zoom In">一键放大</span>
+              </button>
+              
+              <!-- Reset Button -->
+              <button onclick="resetBoard()" class="flex items-center gap-1 bg-red-500 hover:bg-red-600 active:scale-95 text-white px-2.5 py-1 rounded-md text-xs transition-all">
+                <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                <span class="lang-text" data-zh="重置" data-bm="Semula" data-en="Reset">重置</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- The Circuit Drawing Area -->
+          <div id="board-area" class="relative w-full h-[320px] md:h-[350px] bg-sky-50/50 rounded-2xl border-2 border-dashed border-sky-200 transition-all duration-300">
+            
+            <!-- SVG Container for Wires -->
+            <svg id="wire-svg" class="absolute inset-0 w-full h-full pointer-events-none z-10">
+              <defs>
+                <linearGradient id="bulb-glow" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#fef08a" />
+                  <stop offset="100%" stop-color="#eab308" />
+                </linearGradient>
+              </defs>
+            </svg>
+
+            <!-- Component 1: Battery Holder (LEFT (+) POSITIVE, RIGHT (-) NEGATIVE) -->
+            <div id="comp-battery" class="absolute left-1/2 -translate-x-1/2 top-4 w-48 h-20 bg-amber-900/10 rounded-lg p-1 flex items-center justify-between z-20">
+              <!-- Left Terminal (+) Red (Positive) -->
+              <div id="term-batt-pos" onclick="handleTerminalClick('batt_pos')" class="absolute -left-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-red-600 border-2 border-red-300 cursor-pointer flex items-center justify-center text-sm text-white font-extrabold shadow hover:scale-110 active:scale-90 transition-all z-30">+</div>
+              
+              <!-- Battery Box Body -->
+              <div class="w-full h-full bg-gradient-to-r from-neutral-700 via-neutral-800 to-neutral-700 rounded-md border border-neutral-600 flex items-center justify-center relative shadow-md">
+                <div class="text-white text-[10px] uppercase tracking-widest font-bold opacity-80 select-none">1.5V Dry Cell</div>
+                <!-- Battery Details (Left Side +, Right Side -) -->
+                <div class="absolute inset-x-2 top-1 bottom-1 bg-amber-500 rounded flex items-center justify-between px-2.5 text-amber-950 font-bold text-sm shadow-inner">
+                  <span class="text-lg font-black text-red-700">+</span>
+                  <span class="text-[10px] uppercase tracking-wider font-extrabold lang-text" data-zh="干电池" data-bm="Sel Kering" data-en="Dry Cell">干电池</span>
+                  <span class="text-lg font-black text-neutral-800">-</span>
+                </div>
+              </div>
+
+              <!-- Right Terminal (-) Black (Negative) -->
+              <div id="term-batt-neg" onclick="handleTerminalClick('batt_neg')" class="absolute -right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-slate-800 border-2 border-slate-300 cursor-pointer flex items-center justify-center text-sm text-white font-extrabold shadow hover:scale-110 active:scale-90 transition-all z-30">-</div>
+            </div>
+
+            <!-- Component 2: Light Bulb Socket -->
+            <div id="comp-bulb" class="absolute right-8 bottom-8 w-28 h-28 bg-slate-300/30 rounded-full border-4 border-white/50 p-2 flex flex-col items-center justify-center z-20">
+              <!-- Left Terminal -->
+              <div id="term-bulb-left" onclick="handleTerminalClick('bulb_1')" class="absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-yellow-600 border-2 border-yellow-200 cursor-pointer flex items-center justify-center text-[9px] text-white font-bold shadow hover:scale-110 active:scale-90 transition-all z-30">T1</div>
+              
+              <!-- Bulb Base and Globe -->
+              <div class="relative flex flex-col items-center justify-center">
+                <!-- Glow Effect Layer -->
+                <div id="bulb-glow-halo" class="absolute -top-6 w-16 h-16 rounded-full bg-yellow-300/0 transition-all duration-500 z-10 pointer-events-none"></div>
+                
+                <!-- Bulb Glass -->
+                <div id="bulb-glass" class="w-12 h-12 rounded-full border-2 border-slate-400 bg-slate-100/50 flex items-center justify-center relative z-20 transition-all duration-500">
+                  <!-- Filament -->
+                  <div id="bulb-filament" class="w-4 h-3 border-t-2 border-x-2 border-slate-500 rounded-t-full transition-all duration-300"></div>
+                </div>
+                <!-- Metal Base -->
+                <div class="w-8 h-6 bg-slate-400 border-x border-slate-500 relative z-20 shadow-inner flex flex-col justify-between py-0.5">
+                  <div class="w-full h-1 bg-slate-500"></div>
+                  <div class="w-full h-1 bg-slate-500"></div>
+                </div>
+                <div class="w-24 text-center mt-1"><span class="bg-yellow-100 text-yellow-800 text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-sm lang-text" data-zh="灯泡" data-bm="Mentol" data-en="Bulb">灯泡</span></div>
+              </div>
+
+              <!-- Right Terminal -->
+              <div id="term-bulb-right" onclick="handleTerminalClick('bulb_2')" class="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-yellow-600 border-2 border-yellow-200 cursor-pointer flex items-center justify-center text-[9px] text-white font-bold shadow hover:scale-110 active:scale-90 transition-all z-30">T2</div>
+            </div>
+
+            <!-- Component 3: Knife Switch -->
+            <div id="comp-switch" class="absolute left-8 bottom-8 w-32 h-24 bg-slate-300/30 rounded-xl border-4 border-white/50 p-2 flex flex-col items-center justify-between z-20">
+              <!-- Switch Label -->
+              <div class="text-[10px] font-bold text-slate-700 bg-blue-100 px-1.5 py-0.5 rounded-full shadow-sm select-none lang-text" data-zh="开关" data-bm="Suis" data-en="Switch">开关</div>
+              
+              <!-- Switch Body / Knife -->
+              <div class="relative w-full h-12 flex justify-center items-center">
+                <!-- Switch Base Line -->
+                <div class="w-16 h-1.5 bg-amber-800 rounded"></div>
+                
+                <!-- Blade / Lever -->
+                <div id="switch-lever" onclick="toggleSwitch()" class="absolute w-12 h-2 bg-yellow-600 origin-left left-[36px] top-[18px] rotate-[-45deg] cursor-pointer hover:bg-yellow-500 shadow-md transition-all duration-300 flex items-center justify-end rounded-full">
+                  <!-- Tiny handle -->
+                  <div class="w-3.5 h-3.5 rounded-full bg-red-600 border border-red-400 -mr-1 shadow"></div>
+                </div>
+              </div>
+
+              <!-- Left Terminal -->
+              <div id="term-switch-left" onclick="handleTerminalClick('switch_1')" class="absolute -left-3 top-[55%] -translate-y-1/2 w-6 h-6 rounded-full bg-slate-500 border-2 border-slate-200 cursor-pointer flex items-center justify-center text-[9px] text-white font-bold shadow hover:scale-110 active:scale-90 transition-all z-30">S1</div>
+              <!-- Right Terminal -->
+              <div id="term-switch-right" onclick="handleTerminalClick('switch_2')" class="absolute -right-3 top-[55%] -translate-y-1/2 w-6 h-6 rounded-full bg-slate-500 border-2 border-slate-200 cursor-pointer flex items-center justify-center text-[9px] text-white font-bold shadow hover:scale-110 active:scale-90 transition-all z-30">S2</div>
+            </div>
+
+          </div>
+
+          <!-- Bottom Action/Result HUD -->
+          <div class="mt-4 bg-slate-50 p-4 rounded-2xl border border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-3 z-10">
+            <div class="flex items-center gap-3">
+              <div id="status-light" class="w-4 h-4 rounded-full bg-red-500 animate-ping"></div>
+              <div>
+                <div class="text-xs text-slate-500 font-bold uppercase tracking-wider lang-text" data-zh="电路状态" data-bm="Status Litar" data-en="Circuit Status">电路状态</div>
+                <div id="status-desc" class="text-sm font-extrabold text-slate-700 lang-text" data-zh="电路尚未连接完整！" data-bm="Litar belum lengkap!" data-en="Circuit incomplete!">电路尚未连接完整！</div>
+              </div>
+            </div>
+
+            <!-- Submit / Test Button -->
+            <div class="flex items-center gap-2">
+              <button onclick="toggleSwitch()" id="btn-toggle-switch" class="px-5 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl font-bold text-sm shadow hover:from-blue-600 hover:to-indigo-700 active:scale-95 transition-all flex items-center gap-2">
+                <i data-lucide="toggle-left" class="w-4 h-4"></i>
+                <span id="btn-toggle-text" class="lang-text" data-zh="拉下闸门 (闭合开关)" data-bm="Tutup Suis" data-en="Close Switch">拉下闸门 (闭合开关)</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Level Success Modal -->
+  <div id="success-modal" class="fixed inset-0 bg-slate-900/70 z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl p-8 max-w-md w-full border-4 border-yellow-400 text-center shadow-2xl transform scale-95 transition-all duration-300">
+      <div class="w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-yellow-400 animate-bounce">
+        <i data-lucide="award" class="w-12 h-12 text-yellow-500 fill-current"></i>
+      </div>
+      <h3 class="text-2xl font-black text-slate-800 mb-2 game-font lang-text" data-zh="🎉 太棒了！灯泡亮了！" data-bm="🎉 Syabas! Mentol Menyala!" data-en="🎉 Awesome! Bulb is lit!">🎉 太棒了！灯泡亮了！</h3>
+      <p class="text-slate-600 text-sm mb-6 lang-text" data-zh="你成功连接了反向干电池的完整电路！干电池、电线、开关和灯泡完美合作，让电流顺利通过！" data-bm="Anda telah berjaya menyambung litar lengkap dengan bateri terbalik!" data-en="You successfully connected a complete circuit with reversed battery!">你成功连接了反向干电池的完整电路！干电池、电线、开关和灯泡完美合作，让电流顺利通过！</p>
+      
+      <!-- Option 1: Speak Trivia -->
+      <button onclick="speakSuccessInfo()" class="w-full py-3 mb-2.5 bg-teal-500 hover:bg-teal-600 text-white font-bold rounded-xl flex items-center justify-center gap-2 shadow-md active:scale-95 transition-all">
+        <i data-lucide="headphones" class="w-5 h-5"></i>
+        <span class="lang-text" data-zh="1. 听听科学小常识 (语音)" data-bm="Dengar Info Sains (Audio)" data-en="Listen to Science Trivia (Audio)">1. 听听科学小常识 (语音)</span>
+      </button>
+
+      <!-- Option 2: Continue Exploring without resetting -->
+      <button onclick="closeModalNoReset()" class="w-full py-3 mb-2.5 bg-sky-500 hover:bg-sky-600 text-white font-bold rounded-xl flex items-center justify-center gap-2 shadow-md active:scale-95 transition-all">
+        <i data-lucide="compass" class="w-5 h-5"></i>
+        <span class="lang-text" data-zh="2. 继续探索 (不会重置)" data-bm="Teruskan Meneroka" data-en="Continue Exploring">2. 继续探索 (不会重置)</span>
+      </button>
+
+      <!-- Option 3: Reset and try again -->
+      <button onclick="closeModalWithReset()" class="w-full py-3 bg-rose-500 hover:bg-rose-600 text-white font-bold rounded-xl flex items-center justify-center gap-2 shadow-md active:scale-95 transition-all">
+        <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
+        <span class="lang-text" data-zh="3. 重置电路" data-bm="Mula Semula" data-en="Reset Circuit">3. 重置电路</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-slate-800 text-slate-400 text-xs py-5 text-center mt-6 border-t border-slate-700">
+    <div class="max-w-5xl mx-auto px-4">
+      <p class="mb-1">© 2026 马来西亚小学二年级科学互动课件设计 — 单元 7：电</p>
+      <p class="text-teal-300 font-bold text-sm my-1.5 tracking-wide">
+        制作人：谢周安老师（Henry S.C.A）
+      </p>
+      <p>DSKP 7.1.1, 7.1.2 — 混合能力差异化设计 (KSSR Semakan)</p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script>
+    // App State
+    let currentLanguage = 'zh';
+    let currentGameMode = 'guided'; // guided or sandbox
+    let isSwitchClosed = false;
+    let selectedWireColor = 'red';
+    let selectedTerminal = null;
+    let connections = []; // items format: { from: 'id', to: 'id', color: 'red'|'black' }
+    let successTimeout = null; // Handler for the 5 seconds delay trigger
+    let isZoomed = false; // Zoom level tracking state
+    let isMockFullscreen = false; // Virtual iframe fullscreen tracking state
+    let matchGameMode = 'name'; // Controls 'name' or 'function' matching mode
+    let selectedActiveOptionId = null; // For click-to-place fallback
+    let placedSlots = {}; // Key: componentId, Value: matched option id
+    let isMatchSubmitted = false;
+    
+    // Guided step definition (Matched to REVERSED battery: left is pos, right is neg)
+    let guidedStep = 0;
+
+    const termPos = {
+      'batt_neg': { x: 0, y: 0, elId: 'term-batt-neg' },
+      'batt_pos': { x: 0, y: 0, elId: 'term-batt-pos' },
+      'bulb_1':   { x: 0, y: 0, elId: 'term-bulb-left' },
+      'bulb_2':   { x: 0, y: 0, elId: 'term-bulb-right' },
+      'switch_1': { x: 0, y: 0, elId: 'term-switch-left' },
+      'switch_2': { x: 0, y: 0, elId: 'term-switch-right' }
+    };
+
+    const instructions = {
+      zh: {
+        step0: "第一步 🔴：点击【干电池的 (+)】接线柱，再点击【开关 S1】连接红色电线！",
+        step1: "第二步 🔴：点击【开关 S2】接线柱，再点击【灯泡 T1】连接红色电线！",
+        step2: "第三步 ⚫：别忘了换黑色电线！点击【灯泡 T2】接线柱，最后连回【干电池的 (-)】！",
+        step3: "做得好！🎉 所有电线都连好了！现在点击【拉下闸门】来闭合开关，让灯泡亮起来吧！",
+        sandbox: "自由探索中 🧠：你可以点击任意两个接线柱连接电线。看看你能否拼出一个可以发亮的完整电路！",
+        needMoreWires: "电路中的电线还不够哦！一个完整的电路至少需要3根电线，分别连接干电池、开关和灯泡！",
+        switchOpen: "电线已经全部连接好啦！但是开关还处于【断开】状态。请点击右下角的蓝色按钮，把闸门拉下来闭合开关！",
+        shortCircuit: "哎呀！检测到短路！你的电线可能绕过了灯泡或者直接把电池的 (+) 和 (-) 连在一起了，这样电流无法流通哦！",
+        notComplete: "连线不正确，电流无法流通！请仔细检查：电线必须把干电池的 (+)、开关、灯泡和 (-) 连成一个没有中断的“圆圈”！"
+      },
+      bm: {
+        step0: "Langkah 1 🔴: Klik terminal [Positif Sel Kering +], kemudian klik [Suis S1] untuk menyambung wayar merah!",
+        step1: "Langkah 2 🔴: Klik terminal [Suis S2], kemudian klik [Mentol T1] untuk menyambung wayar merah!",
+        step2: "Langkah 3 ⚫: Tukar ke wayar hitam! Klik terminal [Mentol T2] dan sambung ke [Negatif Sel Kering -]!",
+        step3: "Bagus! 🎉 Semua wayar disambung! Sekarang klik [Tutup Suis] untuk menyalakan mentol!",
+        sandbox: "Mod Bebas 🧠: Sambung mana-mana terminal secara bebas untuk membina litar lengkap!",
+        needMoreWires: "Wayar tidak mencukupi! Anda memerlukan sekurang-kurangnya 3 wayar untuk menyambung komponen sel kering, suis dan mentol.",
+        switchOpen: "Wayar lengkap, tetapi suis masih terbuka! Sila klik butang biru di bawah untuk menutup suis supaya arus dapat mengalir.",
+        shortCircuit: "Bahaya! Litar pintas dikesan! Wayar anda mungkin menyambungkan terminal bateri secara terus tanpa melalui mentol.",
+        notComplete: "Sambungan salah, arus tidak dapat mengalir! Sila pastikan wayar menyambungkan sel kering, suis, dan mentol dalam satu gelung bulat yang tidak terputus."
+      },
+      en: {
+        step0: "Step 1 🔴: Click [Dry Cell Positive +] terminal, then click [Switch S1] to connect the red wire!",
+        step1: "Step 2 🔴: Click [Switch S2], then click [Bulb T1] to connect the red wire!",
+        step2: "Step 3 ⚫: Select black wire! Click [Bulb T2] and connect it back to [Dry Cell Negative -]!",
+        step3: "Awesome! 🎉 Wires connected! Now click [Close Switch] to light up the bulb!",
+        sandbox: "Sandbox Mode 🧠: Freely connect any terminals. Make sure to build a complete loop to light the bulb!",
+        needMoreWires: "Not enough wires! You need at least 3 wires to connect the dry cell, switch, and bulb.",
+        switchOpen: "All wires are connected, but the switch is still open! Click the blue button below to close the switch lever.",
+        shortCircuit: "Warning! Short circuit detected! Your wires might have bypassed the bulb or connected the battery terminals directly.",
+        notComplete: "Incorrect connections, current cannot flow! Make sure the wires connect the dry cell, switch, and bulb in a single continuous loop."
+      }
+    };
+
+    const componentSpecs = [
+      {
+        id: 'battery',
+        htmlId: 'svg-tpl-battery',
+        audioCn: '干电池',
+        audioBm: 'Sel Kering',
+        name: {
+          zh: '干电池 (gān diàn chí)',
+          bm: 'Sel Kering',
+          en: 'Dry Cell'
+        },
+        func: {
+          zh: '提供电能 🔋',
+          bm: 'Membekalkan tenaga elektrik',
+          en: 'Supplies electrical energy'
+        }
+      },
+      {
+        id: 'bulb',
+        htmlId: 'svg-tpl-bulb',
+        audioCn: '灯泡',
+        audioBm: 'Mentol',
+        name: {
+          zh: '灯泡 (dēng pào)',
+          bm: 'Mentol',
+          en: 'Light Bulb'
+        },
+        func: {
+          zh: '发出光芒 💡',
+          bm: 'Mengeluarkan cahaya',
+          en: 'Emits light'
+        }
+      },
+      {
+        id: 'switch',
+        htmlId: 'svg-tpl-switch',
+        audioCn: '开关',
+        audioBm: 'Suis',
+        name: {
+          zh: '开关 (kāi guān)',
+          bm: 'Suis',
+          en: 'Switch'
+        },
+        func: {
+          zh: '联接或断开电路 🔌',
+          bm: 'Menyambungkan & memutuskan litar',
+          en: 'Connects or breaks circuit'
+        }
+      },
+      {
+        id: 'wire',
+        htmlId: 'svg-tpl-wire',
+        audioCn: '电线',
+        audioBm: 'Wayar',
+        name: {
+          zh: '电线 (diàn xiàn)',
+          bm: 'Wayar',
+          en: 'Connecting Wire'
+        },
+        func: {
+          zh: '输送电流 🔴 ⚫',
+          bm: 'Mengalirkan arus elektrik',
+          en: 'Carries electric current'
+        }
+      }
+    ];
+
+    // Initialize Page
+    window.onload = function() {
+      lucide.createIcons();
+      replicateTplSVGs();
+      updateTerminalCoordinates();
+      setLanguage('zh');
+      switchTab('tab-vocab');
+      window.addEventListener('resize', () => {
+        updateTerminalCoordinates();
+        drawAllWires();
+      });
+      playBeep(400, 0.1);
+    }
+
+    function replicateTplSVGs() {
+      const components = ['battery', 'bulb', 'switch', 'wire'];
+      components.forEach(c => {
+        const source = document.getElementById(`svg-tpl-${c}`);
+        const dest1 = document.getElementById(`target-svg-${c}-1`);
+        const dest2 = document.getElementById(`target-svg-${c}-2`);
+        if (source && dest1) dest1.innerHTML = source.innerHTML;
+        if (source && dest2) dest2.innerHTML = source.innerHTML;
+      });
+    }
+
+    // Switch between 4 Pages/Tabs
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => {
+        el.classList.add('hidden');
+        el.classList.remove('block');
+      });
+
+      if (window.scoreInterval) {
+        clearInterval(window.scoreInterval);
+        window.scoreInterval = null;
+      }
+      const scoreBox = document.getElementById('match-score-box');
+      if (scoreBox) scoreBox.classList.add('hidden');
+
+      ['vocab', 'func', 'match', 'game'].forEach(t => {
+        const btn = document.getElementById(`btn-tab-${t}`);
+        if (btn) {
+          btn.className = "px-4 py-2 text-xs sm:text-sm font-bold rounded-xl transition-all text-teal-800 hover:bg-teal-100/50 flex items-center gap-1.5";
+        }
+      });
+
+      const selectedBtn = document.getElementById(`btn-tab-${tabId.replace('tab-', '')}`);
+      if (selectedBtn) selectedBtn.className = "px-4 py-2 text-xs sm:text-sm font-bold rounded-xl transition-all bg-teal-500 text-white shadow-md flex items-center gap-1.5";
+
+      const activePage = document.getElementById(tabId.replace('tab-', 'page-'));
+      if (activePage) {
+        activePage.classList.remove('hidden');
+        activePage.classList.add('block');
+      }
+
+      if (tabId === 'tab-game') {
+        setTimeout(() => {
+          updateTerminalCoordinates();
+          drawAllWires();
+          updateInstructions();
+          checkCircuitStatus();
+        }, 50);
+      }
+
+      if (tabId === 'tab-match') {
+        initMatchGame();
+      }
+      
+      playBeep(450, 0.08);
+    }
+
+    // Quick navigation from Vocab Card on Page 1 directly focusing onto Page 2
+    viewFunction = function(componentId) {
+      switchTab('tab-func');
+      
+      const targetCard = document.getElementById(`func-card-${componentId}`);
+      if (targetCard) {
+        targetCard.classList.remove('highlight-card');
+        void targetCard.offsetWidth; // trigger reflow
+        targetCard.classList.add('highlight-card');
+        targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      playBeep(550, 0.12);
+    }
+
+    // Language Toggler
+    function setLanguage(lang) {
+      currentLanguage = lang;
+      
+      ['zh', 'bm', 'en'].forEach(l => {
+        const btn = document.getElementById(`lang-${l}`);
+        if (btn) {
+          if (l === lang) {
+            btn.className = "px-2.5 py-1 text-xs font-bold rounded-lg transition-all bg-white text-teal-700 shadow-sm";
+          } else {
+            btn.className = "px-2.5 py-1 text-xs font-bold rounded-lg transition-all text-white hover:bg-teal-500/50";
+          }
+        }
+      });
+
+      document.querySelectorAll('.lang-text').forEach(el => {
+        const text = el.getAttribute(`data-${lang}`);
+        if (text) el.textContent = text;
+      });
+
+      updateInstructions();
+      checkCircuitStatus();
+      
+      const pageMatch = document.getElementById('page-match');
+      if (pageMatch && !pageMatch.classList.contains('hidden')) {
+        renderMatchDropzonesAndOptions();
+      }
+    }
+
+    // --- INTERACTIVE DRAG & DROP MATCHING GAME LOGIC (PAGE 3) ---
+
+    function setMatchMode(mode) {
+      matchGameMode = mode;
+      
+      const btnName = document.getElementById('btn-match-mode-name');
+      const btnFunc = document.getElementById('btn-match-mode-function');
+
+      if (mode === 'name') {
+        btnName.className = "flex-1 py-2 px-3 rounded-xl font-extrabold text-xs sm:text-sm bg-white text-emerald-800 shadow-sm transition-all";
+        btnFunc.className = "flex-1 py-2 px-3 rounded-xl font-extrabold text-xs sm:text-sm text-emerald-700 hover:bg-emerald-50 transition-all";
+      } else {
+        btnFunc.className = "flex-1 py-2 px-3 rounded-xl font-extrabold text-xs sm:text-sm bg-white text-emerald-800 shadow-sm transition-all";
+        btnName.className = "flex-1 py-2 px-3 rounded-xl font-extrabold text-xs sm:text-sm text-emerald-700 hover:bg-emerald-50 transition-all";
+      }
+      playBeep(520, 0.08);
+      initMatchGame();
+    }
+
+    let shuffledComponents = []; 
+    let shuffledOptions = [];    
+
+    function shuffleArray(arr) {
+      const copy = [...arr];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function initMatchGame() {
+      selectedActiveOptionId = null;
+      placedSlots = {
+        'battery': null,
+        'bulb': null,
+        'switch': null,
+        'wire': null
+      };
+      isMatchSubmitted = false;
+      
+      if (window.scoreInterval) {
+        clearInterval(window.scoreInterval);
+        window.scoreInterval = null;
+      }
+      const scoreBox = document.getElementById('match-score-box');
+      if (scoreBox) scoreBox.classList.add('hidden');
+
+      shuffledComponents = shuffleArray(componentSpecs);
+      shuffledOptions = shuffleArray(componentSpecs);
+
+      document.getElementById('match-victory-box').classList.add('hidden');
+      
+      const submitBtn = document.getElementById('btn-match-submit');
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.className = "px-8 py-3 bg-slate-300 text-slate-500 cursor-not-allowed font-black rounded-2xl shadow-md transition-all flex items-center gap-2 text-sm sm:text-base";
+      }
+
+      const statusBadge = document.getElementById('match-status-badge');
+      if (statusBadge) {
+        statusBadge.className = "px-2.5 py-1 text-xs font-black rounded-full bg-amber-100 text-amber-700 lang-text";
+        statusBadge.textContent = currentLanguage === 'zh' ? '正在匹配...' : (currentLanguage === 'bm' ? 'Menghubung...' : 'Matching...');
+      }
+
+      renderMatchDropzonesAndOptions();
+    }
+
+    function renderMatchDropzonesAndOptions() {
+      const dropzoneContainer = document.getElementById('match-dropzones-container');
+      const optionsPool = document.getElementById('match-options-pool');
+
+      if (!dropzoneContainer || !optionsPool) return;
+
+      dropzoneContainer.innerHTML = '';
+      optionsPool.innerHTML = '';
+
+      shuffledComponents.forEach(comp => {
+        const dropzone = document.createElement('div');
+        dropzone.className = "bg-white rounded-2xl p-3 border-2 border-slate-100 flex flex-col items-center justify-between text-center shadow-sm relative";
+        
+        const svgHTML = document.getElementById(`svg-tpl-${comp.id}`).innerHTML;
+        const placedOptionId = placedSlots[comp.id];
+        let slotContentHTML = "";
+        let slotClass = "border-dashed border-2 border-slate-300 bg-slate-50 text-slate-400 hover:border-amber-400 hover:bg-amber-50/30";
+
+        if (placedOptionId) {
+          const placedItem = componentSpecs.find(c => c.id === placedOptionId);
+          const optionText = matchGameMode === 'name' ? placedItem.name[currentLanguage] : placedItem.func[currentLanguage];
+          slotClass = "border-solid border-2 border-amber-400 bg-amber-50 text-amber-900 shadow-sm font-bold";
+          
+          slotContentHTML = `
+            <div class="w-full text-center px-2 py-2 flex items-center justify-between gap-1">
+              <span class="text-xs font-bold leading-tight select-none">${optionText}</span>
+              <button onclick="removePlacedItem('${comp.id}', event)" class="text-rose-500 hover:text-rose-700 hover:scale-110 active:scale-95 transition-all focus:outline-none" title="移除 / Alih">
+                <i data-lucide="x-circle" class="w-4 h-4 shrink-0"></i>
+              </button>
+            </div>
+          `;
+        } else {
+          slotContentHTML = `
+            <div class="text-[10px] sm:text-xs font-medium px-2 py-3 select-none flex flex-col items-center gap-1 text-slate-400">
+              <i data-lucide="download-cloud" class="w-4 h-4 text-slate-300"></i>
+              <span class="lang-text" data-zh="放入答案" data-bm="Letak Sini" data-en="Drop answer">放入答案</span>
+            </div>
+          `;
+        }
+
+        dropzone.innerHTML = `
+          <div onclick="speakText('${comp.id}')" class="w-full h-24 sm:h-28 bg-slate-50/50 rounded-xl flex items-center justify-center relative cursor-pointer border border-slate-100 hover:bg-slate-50 transition-all mb-3" title="点击听发音">
+            <div class="w-full h-full flex items-center justify-center transform scale-90 sm:scale-100">${svgHTML}</div>
+            <span class="absolute top-1.5 right-1.5 p-0.5 bg-slate-200/60 rounded text-[9px] font-bold text-slate-500 flex items-center gap-0.5">
+              <i data-lucide="volume-2" class="w-3 h-3"></i>
+            </span>
+          </div>
+
+          <div id="dropzone-${comp.id}" 
+               ondragover="allowDragMatch(event)" 
+               ondrop="handleDropMatch(event, '${comp.id}')"
+               onclick="handleSlotClick('${comp.id}')"
+               class="w-full min-h-[50px] rounded-xl flex items-center justify-center transition-all cursor-pointer ${slotClass}">
+            ${slotContentHTML}
+          </div>
+        `;
+        dropzoneContainer.appendChild(dropzone);
+      });
+
+      shuffledOptions.forEach(opt => {
+        const isPlaced = Object.values(placedSlots).includes(opt.id);
+        
+        if (!isPlaced) {
+          const optCard = document.createElement('div');
+          const isSelected = selectedActiveOptionId === opt.id;
+          let selectClass = isSelected ? "option-selected ring-4 ring-amber-200" : "bg-white border-slate-200 hover:border-emerald-300 hover:shadow-sm";
+          
+          optCard.className = `p-3 min-h-[64px] rounded-xl border-2 shadow-sm flex items-center justify-center text-center cursor-pointer transition-all duration-200 ${selectClass}`;
+          optCard.setAttribute('draggable', 'true');
+          optCard.setAttribute('ondragstart', `handleDragStartMatch(event, '${opt.id}')`);
+          optCard.setAttribute('onclick', `handleOptionClick('${opt.id}')`);
+          
+          const displayText = matchGameMode === 'name' ? opt.name[currentLanguage] : opt.func[currentLanguage];
+
+          optCard.innerHTML = `
+            <div class="flex items-center gap-2">
+              <i data-lucide="grip-vertical" class="w-3.5 h-3.5 text-slate-300 shrink-0 cursor-grab"></i>
+              <span class="text-xs sm:text-sm font-extrabold text-slate-700 leading-tight select-none">${displayText}</span>
+            </div>
+          `;
+          optionsPool.appendChild(optCard);
+        }
+      });
+
+      lucide.createIcons();
+      updateMatchSubmitButtonState();
+    }
+
+    function handleDragStartMatch(ev, optionId) {
+      ev.dataTransfer.setData("text/plain", optionId);
+      selectedActiveOptionId = optionId;
+      playBeep(450, 0.05);
+    }
+
+    function allowDragMatch(ev) {
+      ev.preventDefault();
+    }
+
+    function handleDropMatch(ev, targetCompId) {
+      ev.preventDefault();
+      const optionId = ev.dataTransfer.getData("text/plain") || selectedActiveOptionId;
+      if (optionId) {
+        placeOptionInSlot(optionId, targetCompId);
+      }
+    }
+
+    function handleOptionClick(optionId) {
+      if (selectedActiveOptionId === optionId) {
+        selectedActiveOptionId = null; 
+      } else {
+        selectedActiveOptionId = optionId;
+        playBeep(520, 0.05);
+      }
+      renderMatchDropzonesAndOptions();
+    }
+
+    function handleSlotClick(compId) {
+      if (selectedActiveOptionId) {
+        placeOptionInSlot(selectedActiveOptionId, compId);
+        selectedActiveOptionId = null;
+      }
+    }
+
+    function placeOptionInSlot(optionId, targetCompId) {
+      placedSlots[targetCompId] = optionId;
+      playBeep(650, 0.08);
+      renderMatchDropzonesAndOptions();
+    }
+
+    function removePlacedItem(compId, ev) {
+      if (ev) ev.stopPropagation(); 
+      placedSlots[compId] = null;
+      playBeep(350, 0.08);
+      renderMatchDropzonesAndOptions();
+    }
+
+    function updateMatchSubmitButtonState() {
+      const submitBtn = document.getElementById('btn-match-submit');
+      if (!submitBtn) return;
+      const filledCount = Object.values(placedSlots).filter(v => v !== null).length;
+      
+      if (filledCount === 4 && !isMatchSubmitted) {
+        submitBtn.disabled = false;
+        submitBtn.className = "px-8 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-black rounded-2xl shadow-md transform hover:scale-105 active:scale-95 transition-all flex items-center gap-2 text-sm sm:text-base cursor-pointer";
+      } else {
+        submitBtn.disabled = true;
+        submitBtn.className = "px-8 py-3 bg-slate-300 text-slate-500 cursor-not-allowed font-black rounded-2xl shadow-md transition-all flex items-center gap-2 text-sm sm:text-base";
+      }
+    }
+
+    function checkDragMatching() {
+      isMatchSubmitted = true;
+      let incorrectCount = 0;
+      let correctCount = 0;
+
+      for (let compId in placedSlots) {
+        const optionId = placedSlots[compId];
+        const slotEl = document.getElementById(`dropzone-${compId}`);
+
+        if (slotEl) {
+          if (compId === optionId) {
+            slotEl.className = "w-full min-h-[50px] rounded-xl flex items-center justify-center border-2 border-emerald-500 bg-emerald-50 text-emerald-900 font-bold pointer-events-none";
+            const removeBtn = slotEl.querySelector('button');
+            if (removeBtn) removeBtn.classList.add('hidden');
+            correctCount++;
+          } else {
+            slotEl.className = "w-full min-h-[50px] rounded-xl flex items-center justify-center border-2 border-rose-500 bg-rose-50 text-rose-900 font-bold shake";
+            incorrectCount++;
+          }
+        }
+      }
+
+      const score = correctCount * 25;
+      const scoreValEl = document.getElementById('match-score-val');
+      if (scoreValEl) scoreValEl.textContent = score;
+
+      let starsHtml = "";
+      for (let i = 1; i <= 4; i++) {
+        if (i <= correctCount) {
+          starsHtml += '<i data-lucide="star" class="w-8 h-8 fill-yellow-400 text-yellow-400"></i>';
+        } else {
+          starsHtml += '<i data-lucide="star" class="w-8 h-8 text-slate-300"></i>';
+        }
+      }
+      const starsContainer = document.getElementById('score-stars-container');
+      if (starsContainer) starsContainer.innerHTML = starsHtml;
+      lucide.createIcons();
+
+      let feedback = { zh: "", bm: "", en: "" };
+      if (correctCount === 4) {
+        feedback.zh = "太棒了！你全部答对了！💯";
+        feedback.bm = "Hebat! Semua jawapan anda betul! 💯";
+        feedback.en = "Perfect! You got everything right! 💯";
+      } else if (correctCount >= 2) {
+        feedback.zh = `很棒！你答对了 ${correctCount} 个。再接再厉！👍`;
+        feedback.bm = `Bagus! Anda betul ${correctCount}. Teruskan usaha! 👍`;
+        feedback.en = `Good job! You got ${correctCount} correct. Keep trying! 👍`;
+      } else {
+        feedback.zh = `加油！你答对了 ${correctCount} 个。再试一次，你一定行！💪`;
+        feedback.bm = `Cuba lagi! Anda betul ${correctCount}. Anda boleh melakukannya! 💪`;
+        feedback.en = `Keep going! You got ${correctCount} correct. You can do this! 💪`;
+      }
+      const feedbackEl = document.getElementById('match-score-feedback');
+      if (feedbackEl) feedbackEl.textContent = feedback[currentLanguage];
+
+      if (correctCount === 4) {
+        playBeep(523.25, 0.12);
+        setTimeout(() => playBeep(659.25, 0.12), 100);
+        setTimeout(() => playBeep(783.99, 0.12), 200);
+        setTimeout(() => playBeep(1046.50, 0.35), 300);
+      } else if (correctCount >= 2) {
+        playBeep(440, 0.12);
+        setTimeout(() => playBeep(554.37, 0.12), 120);
+        setTimeout(() => playBeep(659.25, 0.25), 240);
+      } else {
+        playBeep(220, 0.15, 'sawtooth');
+        setTimeout(() => playBeep(200, 0.25, 'sawtooth'), 150);
+      }
+
+      const scoreBox = document.getElementById('match-score-box');
+      if (scoreBox) scoreBox.classList.remove('hidden');
+
+      let timeLeft = 5;
+      const btnText = document.getElementById('countdown-btn-text');
+      
+      if (window.scoreInterval) clearInterval(window.scoreInterval);
+      
+      function updateButtonText() {
+        if (!btnText) return;
+        const labels = {
+          zh: `继续配对 (${timeLeft}秒)...`,
+          bm: `Teruskan Padanan (${timeLeft}s)...`,
+          en: `Continue Matching (${timeLeft}s)...`
+        };
+        btnText.textContent = labels[currentLanguage];
+      }
+      
+      updateButtonText();
+      
+      window.scoreInterval = setInterval(() => {
+        timeLeft--;
+        if (timeLeft <= 0) {
+          clearInterval(window.scoreInterval);
+          window.scoreInterval = null;
+          skipScoreCountdown();
+        } else {
+          updateButtonText();
+        }
+      }, 1000);
+    }
+
+    function skipScoreCountdown() {
+      if (window.scoreInterval) {
+        clearInterval(window.scoreInterval);
+        window.scoreInterval = null;
+      }
+      const scoreBox = document.getElementById('match-score-box');
+      if (scoreBox) scoreBox.classList.add('hidden');
+      finalizeMatchResults();
+    }
+
+    function finalizeMatchResults() {
+      let incorrectCount = 0;
+      for (let compId in placedSlots) {
+        if (compId !== placedSlots[compId]) {
+          placedSlots[compId] = null;
+          incorrectCount++;
+        }
+      }
+
+      const statusBadge = document.getElementById('match-status-badge');
+
+      if (incorrectCount === 0) {
+        if (statusBadge) {
+          statusBadge.className = "px-2.5 py-1 text-xs font-black rounded-full bg-emerald-100 text-emerald-700 lang-text";
+          statusBadge.textContent = currentLanguage === 'zh' ? '完美匹配！' : (currentLanguage === 'bm' ? 'Tahniah! Semua Betul!' : 'Perfect match!');
+        }
+        
+        const victoryBox = document.getElementById('match-victory-box');
+        if (victoryBox) victoryBox.classList.remove('hidden');
+        
+        playBeep(523.25, 0.12);
+        setTimeout(() => playBeep(659.25, 0.12), 100);
+        setTimeout(() => playBeep(783.99, 0.12), 200);
+        setTimeout(() => playBeep(1046.50, 0.45), 300);
+      } else {
+        isMatchSubmitted = false;
+        renderMatchDropzonesAndOptions();
+
+        if (statusBadge) {
+          statusBadge.className = "px-2.5 py-1 text-xs font-black rounded-full bg-amber-100 text-amber-700 lang-text";
+          statusBadge.textContent = currentLanguage === 'zh' ? '继续配对中...' : (currentLanguage === 'bm' ? 'Lengkapkan padanan...' : 'Continue matching...');
+        }
+      }
+    }
+
+    // DFS Connection Checker & Diagnostics
+    function checkCircuitStatus() {
+      const statusLight = document.getElementById('status-light');
+      const statusDesc = document.getElementById('status-desc');
+      const bulbGlass = document.getElementById('bulb-glass');
+      const bulbFilament = document.getElementById('bulb-filament');
+      const bulbGlow = document.getElementById('bulb-glow-halo');
+
+      if (!statusLight || !statusDesc) return;
+
+      function traceCircuit(activeSwitchState) {
+        const adj = {
+          'batt_neg': [], 'batt_pos': [],
+          'bulb_1': [], 'bulb_2': [],
+          'switch_1': [], 'switch_2': []
+        };
+
+        connections.forEach(conn => {
+          if (adj[conn.from] && adj[conn.to]) {
+            adj[conn.from].push(conn.to);
+            adj[conn.to].push(conn.from);
+          }
+        });
+
+        let hasBulbPath = false;
+        let hasShortCircuit = false;
+
+        function dfs(current, visited, containsBulbLink) {
+          if (current === 'batt_neg') {
+            if (containsBulbLink) {
+              hasBulbPath = true;
+            } else {
+              hasShortCircuit = true;
+            }
+            return;
+          }
+
+          visited.add(current);
+
+          if (current === 'bulb_1' && !visited.has('bulb_2')) {
+            dfs('bulb_2', new Set(visited), true);
+          }
+          if (current === 'bulb_2' && !visited.has('bulb_1')) {
+            dfs('bulb_1', new Set(visited), true);
+          }
+
+          if (activeSwitchState) {
+            if (current === 'switch_1' && !visited.has('switch_2')) {
+              dfs('switch_2', new Set(visited), containsBulbLink);
+            }
+            if (current === 'switch_2' && !visited.has('switch_1')) {
+              dfs('switch_1', new Set(visited), containsBulbLink);
+            }
+          }
+
+          const neighbors = adj[current] || [];
+          neighbors.forEach(neighbor => {
+            if (!visited.has(neighbor)) {
+              dfs(neighbor, new Set(visited), containsBulbLink);
+            }
+          });
+        }
+
+        dfs('batt_pos', new Set(), false);
+        return { hasBulbPath, hasShortCircuit };
+      }
+
+      const currentStatus = traceCircuit(isSwitchClosed);
+      const potentialStatus = traceCircuit(true);
+
+      if (currentStatus.hasBulbPath && isSwitchClosed && !currentStatus.hasShortCircuit) {
+        statusLight.className = "w-4 h-4 rounded-full bg-emerald-500 animate-pulse";
+        statusDesc.setAttribute('data-zh', '恭喜！这是一个完整电路！💡');
+        statusDesc.setAttribute('data-bm', 'Syabas! Ini ialah litar lengkap! 💡');
+        statusDesc.setAttribute('data-en', 'Success! This is a complete circuit! 💡');
+        
+        if (bulbGlass) bulbGlass.className = "w-12 h-12 rounded-full border-2 border-yellow-300 bg-yellow-200 glow-yellow flex items-center justify-center relative z-20 transition-all duration-300";
+        if (bulbFilament) bulbFilament.className = "w-4 h-3 border-t-2 border-x-2 border-red-500 rounded-t-full transition-all duration-300";
+        if (bulbGlow) bulbGlow.className = "absolute -top-6 w-16 h-16 rounded-full bg-yellow-300/40 blur-md scale-150 z-10 pointer-events-none transition-all duration-300 animate-pulse";
+
+        if (!successTimeout) {
+          successTimeout = setTimeout(() => {
+            openModal();
+            playBeep(523.25, 0.15); 
+            setTimeout(() => playBeep(659.25, 0.15), 150); 
+            setTimeout(() => playBeep(783.99, 0.3), 300); 
+            successTimeout = null;
+          }, 1000); // Triggers success modal on 1 second delay
+        }
+      } else {
+        if (successTimeout) {
+          clearTimeout(successTimeout);
+          successTimeout = null;
+        }
+
+        statusLight.className = "w-4 h-4 rounded-full bg-red-500";
+        if (bulbGlass) bulbGlass.className = "w-12 h-12 rounded-full border-2 border-slate-400 bg-slate-100/50 flex items-center justify-center relative z-20 transition-all duration-300";
+        if (bulbFilament) bulbFilament.className = "w-4 h-3 border-t-2 border-x-2 border-slate-500 rounded-t-full transition-all duration-300";
+        if (bulbGlow) bulbGlow.className = "absolute -top-6 w-16 h-16 rounded-full bg-yellow-300/0 transition-all duration-300 z-10 pointer-events-none";
+
+        if (currentStatus.hasShortCircuit) {
+          statusDesc.setAttribute('data-zh', instructions.zh.shortCircuit);
+          statusDesc.setAttribute('data-bm', instructions.bm.shortCircuit);
+          statusDesc.setAttribute('data-en', instructions.en.shortCircuit);
+        } else if (connections.length < 3) {
+          statusDesc.setAttribute('data-zh', instructions.zh.needMoreWires);
+          statusDesc.setAttribute('data-bm', instructions.bm.needMoreWires);
+          statusDesc.setAttribute('data-en', instructions.en.needMoreWires);
+        } else if (!isSwitchClosed && potentialStatus.hasBulbPath) {
+          statusDesc.setAttribute('data-zh', instructions.zh.switchOpen);
+          statusDesc.setAttribute('data-bm', instructions.bm.switchOpen);
+          statusDesc.setAttribute('data-en', instructions.en.switchOpen);
+        } else {
+          statusDesc.setAttribute('data-zh', instructions.zh.notComplete);
+          statusDesc.setAttribute('data-bm', instructions.bm.notComplete);
+          statusDesc.setAttribute('data-en', instructions.en.notComplete);
+        }
+      }
+
+      const descText = statusDesc.getAttribute(`data-${currentLanguage}`);
+      if (descText) statusDesc.textContent = descText;
+    }
+
+    // Mode Toggler for Sandbox/Guided Game
+    function setMode(mode) {
+      currentGameMode = mode;
+      
+      const btnGuided = document.getElementById('mode-guided');
+      const btnSandbox = document.getElementById('mode-sandbox');
+      
+      if (mode === 'guided') {
+        if (btnGuided) btnGuided.className = "p-2.5 rounded-xl border-2 border-amber-400 bg-amber-50 text-amber-800 font-bold text-sm flex flex-col items-center gap-1 transition-all";
+        if (btnSandbox) btnSandbox.className = "p-2.5 rounded-xl border-2 border-slate-200 bg-slate-50 text-slate-600 font-bold text-sm flex flex-col items-center gap-1 transition-all hover:bg-slate-100";
+        guidedStep = 0;
+        resetBoard();
+      } else {
+        if (btnSandbox) btnSandbox.className = "p-2.5 rounded-xl border-2 border-teal-500 bg-teal-50 text-teal-800 font-bold text-sm flex flex-col items-center gap-1 transition-all";
+        if (btnGuided) btnGuided.className = "p-2.5 rounded-xl border-2 border-slate-200 bg-slate-50 text-slate-600 font-bold text-sm flex flex-col items-center gap-1 transition-all hover:bg-slate-100";
+        resetBoard();
+      }
+      
+      updateInstructions();
+    }
+
+    function setWireColor(color) {
+      selectedWireColor = color;
+      const btnRed = document.getElementById('btn-wire-red');
+      const btnBlack = document.getElementById('btn-wire-black');
+      if (!btnRed || !btnBlack) return;
+
+      const iconRed = btnRed.querySelector('.wire-check-icon');
+      const iconBlack = btnBlack.querySelector('.wire-check-icon');
+
+      if (color === 'red') {
+        btnRed.className = "flex items-center justify-between px-3 py-2.5 rounded-xl border-2 border-red-500 bg-red-100 text-red-700 font-bold text-sm transition-all ring-4 ring-red-300";
+        btnBlack.className = "flex items-center justify-between px-3 py-2.5 rounded-xl border-2 border-slate-700 bg-slate-100 text-slate-700 font-bold text-sm transition-all";
+        if (iconRed) iconRed.setAttribute('class', 'lucide lucide-check wire-check-icon w-4 h-4 text-red-600');
+        if (iconBlack) iconBlack.setAttribute('class', 'lucide lucide-check wire-check-icon w-4 h-4 text-transparent');
+      } else {
+        btnBlack.className = "flex items-center justify-between px-3 py-2.5 rounded-xl border-2 border-slate-700 bg-slate-800 text-white font-bold text-sm transition-all ring-4 ring-slate-400";
+        btnRed.className = "flex items-center justify-between px-3 py-2.5 rounded-xl border-2 border-red-500 bg-red-100 text-red-700 font-bold text-sm transition-all";
+        if (iconBlack) iconBlack.setAttribute('class', 'lucide lucide-check wire-check-icon w-4 h-4 text-white');
+        if (iconRed) iconRed.setAttribute('class', 'lucide lucide-check wire-check-icon w-4 h-4 text-transparent');
+      }
+      playBeep(600, 0.05);
+    }
+
+    // TTS Web Speech Synthesizer
+    function speakText(compId) {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        
+        const item = componentSpecs.find(c => c.id === compId);
+        if (!item) return;
+
+        let utteranceText = "";
+        let langCode = "zh-CN";
+        
+        if (currentLanguage === 'zh') {
+          utteranceText = item.audioCn; 
+          langCode = "zh-CN";
+        } else if (currentLanguage === 'bm') {
+          utteranceText = item.audioBm; 
+          langCode = "ms-MY";
+        } else {
+          utteranceText = item.name.en; 
+          langCode = "en-US";
+        }
+        
+        const utterance = new SpeechSynthesisUtterance(utteranceText);
+        utterance.lang = langCode;
+        utterance.rate = 0.85;
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+
+    // Success Trivia spoken output
+    function speakSuccessInfo() {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        let text = "";
+        let lang = "zh-CN";
+        
+        if (currentLanguage === 'zh') {
+          text = "科学小常识：在完整的电路中，干电池提供电能，电流从正极出发，通过电线流经开关和灯泡，最后回到负极，这样灯泡才会亮哦！";
+          lang = "zh-CN";
+        } else if (currentLanguage === 'bm') {
+          text = "Info Sains: Walaupun kedudukan sel kering diterbalikkan, litar lengkap masih terhasil. Arus elektrik mengalir keluar dari terminal positif, merentasi suis dan mentol, lalu kembali ke terminal negatif.";
+          lang = "ms-MY";
+        } else {
+          text = "Science Info: Even though the battery is reversed, it is still a complete circuit. Current still flows out from the positive terminal, through the switch and bulb, and returns to the negative terminal.";
+          lang = "en-US";
+        }
+        
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = lang;
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+
+    // Sound Synthesizer via Web Audio API
+    function playBeep(frequency = 440, duration = 0.1, type = 'sine') {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        
+        oscillator.type = type;
+        oscillator.frequency.value = frequency;
+        gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+        
+        oscillator.start();
+        oscillator.stop(audioCtx.currentTime + duration);
+      } catch (e) {
+        console.log("Audio not supported or blocked");
+      }
+    }
+
+    // Find and update positions of terminals on the board dynamically
+    function updateTerminalCoordinates() {
+      const board = document.getElementById('board-area').getBoundingClientRect();
+      for (let id in termPos) {
+        const el = document.getElementById(termPos[id].elId);
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          termPos[id].x = rect.left - board.left + rect.width / 2;
+          termPos[id].y = rect.top - board.top + rect.height / 2;
+        }
+      }
+    }
+
+    // Terminal Interaction Logic
+    function handleTerminalClick(id) {
+      updateTerminalCoordinates();
+      playBeep(520, 0.08);
+
+      if (currentGameMode === 'guided') {
+        const stepAllowed = getGuidedStepTerminals(guidedStep);
+        if (!stepAllowed.includes(id)) {
+          playBeep(180, 0.2, 'square');
+          return;
+        }
+      }
+
+      const termEl = document.getElementById(termPos[id].elId);
+
+      if (selectedTerminal === null) {
+        selectedTerminal = id;
+        if (termEl) termEl.classList.add('ring-4', 'ring-yellow-400', 'scale-125');
+      } else {
+        if (selectedTerminal === id) {
+          if (termEl) termEl.classList.remove('ring-4', 'ring-yellow-400', 'scale-125');
+          selectedTerminal = null;
+          return;
+        }
+
+        const firstTerm = document.getElementById(termPos[selectedTerminal].elId);
+        if (firstTerm) firstTerm.classList.remove('ring-4', 'ring-yellow-400', 'scale-125');
+
+        const duplicateIdx = connections.findIndex(c => 
+          (c.from === selectedTerminal && c.to === id) || (c.from === id && c.to === selectedTerminal)
+        );
+
+        if (duplicateIdx === -1) {
+          const isSameComponent = (selectedTerminal.split('_')[0] === id.split('_')[0]);
+          if (isSameComponent) {
+            playBeep(180, 0.2, 'square');
+            selectedTerminal = null;
+            return;
+          }
+
+          connections.push({
+            from: selectedTerminal,
+            to: id,
+            color: selectedWireColor
+          });
+          playBeep(680, 0.15);
+
+          if (currentGameMode === 'guided') {
+            if (guidedStep === 0) setWireColor('red');
+            if (guidedStep === 1) setWireColor('black');
+            guidedStep++;
+          }
+        }
+
+        selectedTerminal = null;
+        drawAllWires();
+        updateInstructions();
+        checkCircuitStatus();
+      }
+    }
+
+    function getGuidedStepTerminals(step) {
+      switch (step) {
+        case 0: return ['batt_pos', 'switch_1'];
+        case 1: return ['switch_2', 'bulb_1'];
+        case 2: return ['bulb_2', 'batt_neg'];
+        default: return [];
+      }
+    }
+
+    // Toggle Workspace Zoom Mode (Classroom Theatre mode)
+    function toggleZoom() {
+      isZoomed = !isZoomed;
+      const card = document.getElementById('interactive-board-card');
+      const backdrop = document.getElementById('zoom-backdrop');
+      const zoomBtnText = document.getElementById('zoom-btn-text');
+      const zoomBtnIcon = document.getElementById('zoom-btn-icon');
+      
+      if (!card || !backdrop || !zoomBtnText || !zoomBtnIcon) return;
+
+      if (isZoomed) {
+        card.classList.add('fixed', 'inset-4', 'md:inset-10', 'z-50', 'shadow-2xl', 'border-teal-500', 'bg-white', 'p-6');
+        card.classList.remove('relative');
+        backdrop.classList.remove('hidden');
+        
+        zoomBtnIcon.setAttribute('data-lucide', 'minimize-2');
+        zoomBtnText.setAttribute('data-zh', '恢复原样');
+        zoomBtnText.setAttribute('data-bm', 'Kecilkan');
+        zoomBtnText.setAttribute('data-en', 'Minimize');
+      } else {
+        card.classList.remove('fixed', 'inset-4', 'md:inset-10', 'z-50', 'shadow-2xl', 'border-teal-500', 'bg-white', 'p-6');
+        card.classList.add('relative');
+        backdrop.classList.add('hidden');
+        
+        zoomBtnIcon.setAttribute('data-lucide', 'maximize-2');
+        zoomBtnText.setAttribute('data-zh', '一键放大');
+        zoomBtnText.setAttribute('data-bm', 'Besarkan');
+        zoomBtnText.setAttribute('data-en', 'Zoom In');
+      }
+      
+      lucide.createIcons();
+      const text = zoomBtnText.getAttribute(`data-${currentLanguage}`);
+      if (text) zoomBtnText.textContent = text;
+
+      setTimeout(() => {
+        updateTerminalCoordinates();
+        drawAllWires();
+      }, 150);
+    }
+
+    // Backdrop click cancels zoom
+    const backdropEl = document.getElementById('zoom-backdrop');
+    if (backdropEl) {
+      backdropEl.onclick = function() {
+        if (isZoomed) toggleZoom();
+      };
+    }
+
+    function resetBoard() {
+      connections = [];
+      selectedTerminal = null;
+      isSwitchClosed = false;
+      guidedStep = 0;
+      if (successTimeout) {
+        clearTimeout(successTimeout);
+        successTimeout = null;
+      }
+      
+      const lever = document.getElementById('switch-lever');
+      if (lever) lever.style.transform = 'rotate(-45deg)';
+      
+      const btnToggle = document.getElementById('btn-toggle-switch');
+      const btnText = document.getElementById('btn-toggle-text');
+      if (btnToggle && btnText) {
+        btnToggle.className = "px-5 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl font-bold text-sm shadow hover:from-blue-600 hover:to-indigo-700 active:scale-95 transition-all flex items-center gap-2";
+        btnText.setAttribute('data-zh', '拉下闸门 (闭合开关)');
+        btnText.setAttribute('data-bm', 'Tutup Suis');
+        btnText.setAttribute('data-en', 'Close Switch');
+      }
+      
+      setWireColor('red');
+      drawAllWires();
+      updateInstructions();
+      checkCircuitStatus();
+      playBeep(300, 0.15, 'sawtooth');
+    }
+
+    function openModal() {
+      const modal = document.getElementById('success-modal');
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+    }
+
+    function closeModalNoReset() {
+      const modal = document.getElementById('success-modal');
+      if (modal) {
+        modal.classList.remove('flex');
+        modal.classList.add('hidden');
+      }
+      playBeep(450, 0.1);
+    }
+
+    function closeModalWithReset() {
+      const modal = document.getElementById('success-modal');
+      if (modal) {
+        modal.classList.remove('flex');
+        modal.classList.add('hidden');
+      }
+      resetBoard();
+    }
+
+    // Safe Fullscreen API implementation with automated Simulated Fullscreen fallback inside iframe constraints
+    function toggleFullscreen() {
+      const icon = document.getElementById('fullscreen-icon');
+      
+      function applyMockFullscreen(state) {
+        isMockFullscreen = state;
+        const rootContainer = document.body;
+        if (state) {
+          rootContainer.classList.add('mock-fullscreen-active');
+          if (icon) icon.setAttribute('data-lucide', 'minimize');
+        } else {
+          rootContainer.classList.remove('mock-fullscreen-active');
+          if (icon) icon.setAttribute('data-lucide', 'maximize');
+        }
+        lucide.createIcons();
+        
+        setTimeout(() => {
+          updateTerminalCoordinates();
+          drawAllWires();
+        }, 150);
+      }
+
+      if (!document.fullscreenElement && !isMockFullscreen) {
+        document.documentElement.requestFullscreen()
+          .then(() => {
+            if (icon) icon.setAttribute('data-lucide', 'minimize');
+            lucide.createIcons();
+            setTimeout(() => {
+              updateTerminalCoordinates();
+              drawAllWires();
+            }, 150);
+          })
+          .catch(err => {
+            applyMockFullscreen(true);
+          });
+      } else {
+        if (document.fullscreenElement) {
+          document.exitFullscreen().catch(() => {});
+        }
+        if (isMockFullscreen) {
+          applyMockFullscreen(false);
+        }
+      }
+    }
+
+    // Listen for Escape key exits from native fullscreen to reset icon state safely
+    document.addEventListener('fullscreenchange', () => {
+      const icon = document.getElementById('fullscreen-icon');
+      if (icon) {
+        if (document.fullscreenElement) {
+          icon.setAttribute('data-lucide', 'minimize');
+        } else {
+          if (!isMockFullscreen) {
+            icon.setAttribute('data-lucide', 'maximize');
+          }
+        }
+        lucide.createIcons();
+        setTimeout(() => {
+          updateTerminalCoordinates();
+          drawAllWires();
+        }, 150);
+      }
+    });
+
+    /* Toggle switch status and handle animation */
+    function toggleSwitch() {
+      isSwitchClosed = !isSwitchClosed;
+      
+      const lever = document.getElementById('switch-lever');
+      const btnToggle = document.getElementById('btn-toggle-switch');
+      const btnText = document.getElementById('btn-toggle-text');
+      
+      if (isSwitchClosed) {
+        if (lever) lever.style.transform = 'rotate(0deg)';
+        if (btnToggle) btnToggle.className = "px-5 py-2.5 bg-gradient-to-r from-rose-500 to-red-600 text-white rounded-xl font-bold text-sm shadow hover:from-rose-600 hover:to-red-700 active:scale-95 transition-all flex items-center gap-2";
+        if (btnText) {
+          btnText.setAttribute('data-zh', '拉起闸门 (断开开关)');
+          btnText.setAttribute('data-bm', 'Buka Suis');
+          btnText.setAttribute('data-en', 'Open Switch');
+        }
+      } else {
+        if (lever) lever.style.transform = 'rotate(-45deg)';
+        if (btnToggle) btnToggle.className = "px-5 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl font-bold text-sm shadow hover:from-blue-600 hover:to-indigo-700 active:scale-95 transition-all flex items-center gap-2";
+        if (btnText) {
+          btnText.setAttribute('data-zh', '拉下闸门 (闭合开关)');
+          btnText.setAttribute('data-bm', 'Tutup Suis');
+          btnText.setAttribute('data-en', 'Close Switch');
+        }
+      }
+      
+      if (btnText) {
+        const text = btnText.getAttribute(`data-${currentLanguage}`);
+        if (text) btnText.textContent = text;
+      }
+
+      playBeep(450, 0.1);
+      drawAllWires(); // Redraws wires to show/hide dynamic flowing electrons animation
+      checkCircuitStatus();
+    }
+
+    /* Update workspace context guide description */
+    function updateInstructions() {
+      const instrEl = document.getElementById('instruction-text');
+      if (!instrEl) return;
+      
+      if (currentGameMode === 'sandbox') {
+        instrEl.textContent = instructions[currentLanguage].sandbox;
+      } else {
+        if (guidedStep === 0) {
+          instrEl.textContent = instructions[currentLanguage].step0;
+        } else if (guidedStep === 1) {
+          instrEl.textContent = instructions[currentLanguage].step1;
+        } else if (guidedStep === 2) {
+          instrEl.textContent = instructions[currentLanguage].step2;
+        } else {
+          instrEl.textContent = instructions[currentLanguage].step3;
+        }
+      }
+    }
+
+    /* Draws wires connecting terminal coordinates using SVG bezier quadratic curves */
+    function drawAllWires() {
+      const svg = document.getElementById('wire-svg');
+      if (!svg) return;
+      
+      const defs = svg.querySelector('defs');
+      svg.innerHTML = '';
+      if (defs) svg.appendChild(defs);
+      
+      connections.forEach(conn => {
+        const fromPos = termPos[conn.from];
+        const toPos = termPos[conn.to];
+        if (!fromPos || !toPos) return;
+        
+        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        const x1 = fromPos.x;
+        const y1 = fromPos.y;
+        const x2 = toPos.x;
+        const y2 = toPos.y;
+        
+        const mx = (x1 + x2) / 2;
+        const my = (y1 + y2) / 2 + 30; // sag bend down
+        
+        const d = `M ${x1} ${y1} Q ${mx} ${my} ${x2} ${y2}`;
+        path.setAttribute("d", d);
+        path.setAttribute("fill", "none");
+        
+        const strokeColor = conn.color === 'red' ? '#ef4444' : '#1e293b';
+        path.setAttribute("stroke", strokeColor);
+        path.setAttribute("stroke-width", "5");
+        path.setAttribute("stroke-linecap", "round");
+        
+        if (isSwitchClosed && isCircuitComplete()) {
+          path.setAttribute("class", "wire-active");
+          path.setAttribute("filter", "drop-shadow(0 0 4px rgba(253, 224, 71, 0.8))");
+        }
+        
+        svg.appendChild(path);
+      });
+    }
+
+    /* Helper checking function to trace loop completeness */
+    function isCircuitComplete() {
+      const adj = {
+        'batt_neg': [], 'batt_pos': [],
+        'bulb_1': [], 'bulb_2': [],
+        'switch_1': [], 'switch_2': []
+      };
+
+      connections.forEach(conn => {
+        if (adj[conn.from] && adj[conn.to]) {
+          adj[conn.from].push(conn.to);
+          adj[conn.to].push(conn.from);
+        }
+      });
+
+      let hasBulbPath = false;
+      let hasShortCircuit = false;
+
+      function dfs(current, visited, containsBulbLink) {
+        if (current === 'batt_neg') {
+          if (containsBulbLink) {
+            hasBulbPath = true;
+          } else {
+            hasShortCircuit = true;
+          }
+          return;
+        }
+
+        visited.add(current);
+
+        if (current === 'bulb_1' && !visited.has('bulb_2')) {
+          dfs('bulb_2', new Set(visited), true);
+        }
+        if (current === 'bulb_2' && !visited.has('bulb_1')) {
+          dfs('bulb_1', new Set(visited), true);
+        }
+
+        if (isSwitchClosed) {
+          if (current === 'switch_1' && !visited.has('switch_2')) {
+            dfs('switch_2', new Set(visited), containsBulbLink);
+          }
+          if (current === 'switch_2' && !visited.has('switch_1')) {
+            dfs('switch_1', new Set(visited), containsBulbLink);
+          }
+        }
+
+        const neighbors = adj[current] || [];
+        neighbors.forEach(neighbor => {
+          if (!visited.has(neighbor)) {
+            dfs(neighbor, new Set(visited), containsBulbLink);
+          }
+        });
+      }
+
+      dfs('batt_pos', new Set(), false);
+      return hasBulbPath && !hasShortCircuit;
+    }
+  </script>
+</body>
+</html>
